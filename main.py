@@ -1,122 +1,87 @@
-from datetime import date, datetime
+from fastapi import FastAPI, Depends, HTTPException, Query
+from contextlib import asynccontextmanager
 
-from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import sessionmaker, DeclarativeBase, Mapped, mapped_column, relationship
-
-TEST = 1
-
-if TEST:
-    engine = create_engine('sqlite:///:memory:', echo=True)
-else:
-    engine = create_engine('sqlite:///test.db', echo=True)
-
-Session = sessionmaker(bind=engine)
-
-class Base(DeclarativeBase):
-    __abstract__ = True
+from crud import db_add_task, db_get_task, db_delete_task, db_get_all_tasks, db_update_task
+from database import get_session, init_db
+from shemas import AddTask, TaskOut, EditTask
 
 
-class Author(Base):
-    __tablename__ = 'author'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False)
-    birth_year: Mapped[int] = mapped_column(nullable=False)
-    books: Mapped[list["Book"]] = relationship(back_populates="author")
-
-class Book(Base):
-    __tablename__ = 'book'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(nullable=False)
-    publication_year: Mapped[int] = mapped_column()
-    author_id: Mapped[int] = mapped_column(ForeignKey('author.id'))
-    author: Mapped["Author"] = relationship(back_populates="books")
-    loans: Mapped[list["Loan"]] = relationship(back_populates="book")
-
-class Member(Base):
-    __tablename__ = 'member'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False)
-    email: Mapped[str] = mapped_column(unique=True)
-    loans: Mapped[list["Loan"]] = relationship(back_populates="member")
-
-class Loan(Base):
-    __tablename__ = 'loan'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    book_id: Mapped[int] = mapped_column(ForeignKey('book.id'))
-    member_id: Mapped[int] = mapped_column(ForeignKey('member.id'))
-    loan_date: Mapped[datetime] = mapped_column(default=datetime.now)
-    return_date: Mapped[date] = mapped_column(nullable=True)
-    book: Mapped["Book"] = relationship(back_populates="loans")
-    member: Mapped["Member"] = relationship(back_populates="loans")
-
-Base.metadata.create_all(engine)
-
-def create_author(name: str, birth_year: int):
-    obj = Author(name=name, birth_year=birth_year)
-    save(obj)
-
-def create_book(title: str, publication_year: int, author_id:int):
-    obj = Book(title=title, publication_year=publication_year, author_id=author_id)
-    save(obj)
-
-def create_member(name: str, email: str):
-    obj = Member(name=name, email=email)
-    save(obj)
-
-def create_loan(book_id: int, member_id: int):
-    obj = Loan(book_id=book_id, member_id=member_id)
-    save(obj)
-
-#Добавление в Сессию
-def add(obj, session: Session):
-    session.add(obj)
-
-#Открыть сессию -> Добавить объект
-def save(obj):
-    with Session(autoflush=False) as session:
-        try:
-            add(obj, session)
-            session.commit()
-        except SQLAlchemyError:
-            session.rollback()
-            raise
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # запуск
+    await init_db()
+    yield
 
 
-create_author("Tolstoy", 1828)
-create_book("War and Peace", 1869, author_id=1)
-create_member("Alice", "alice@example.com")
-create_loan(book_id=1, member_id=1)
-# Загружаем объекты
-with Session(autoflush=False) as session:
+app = FastAPI(lifespan=lifespan)
+
+
+
+@app.post("/tasks/add_task", summary="Добавить задачу")
+#Добавить задачу
+#При отправке post запроса вызывается функция add_task
+async def add_task(task: AddTask, session = Depends(get_session)):
+    #Фастапи парсит тело запроса task в объект Pydantic(AddTask)
+    #session: передаем через Depends функцию которая возвращает одну сессию
     try:
-        author = session.query(Author).first()
-        book = session.query(Book).first()
-        member = session.query(Member).first()
-        loan = session.query(Loan).first()
-        # Проверки связей
-        assert author.name == "Tolstoy"
-        assert book.title == "War and Peace"
-        assert member.name == "Alice"
+        #Пытаемся добавить задачу, если все ок возвращаем id добавленой задачи, если нет вызываем ошибку
+        task = await db_add_task(session, task)
+        return {"success": True, "task_id": task.id}
+    except ValueError as e:  # ошибка клиента
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception:  # любая другая ошибка
+        raise HTTPException(status_code=500, detail="Internal server error")
 
-        assert book.author == author
-        assert author.books[0] == book
+@app.get("/tasks/{task_id}", response_model=TaskOut, summary="Получить задачу по id")
+#Получить задачу
+async def get_task(task_id: int, session = Depends(get_session)):
+    #Пытаемся получить задачу, если не найдено возвращаем ошибку, если найдена
+    task = await db_get_task(session, task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    else:
+        return task
+@app.get("/tasks/", response_model=list[TaskOut], summary="Получить все задачи")
+#Получить все задачи
+async def get_all_task(
+        completed: bool|None = Query(
+            default=None,
+            description="Фильтровать задачи по статусу: выполнено или нет",
+        ),
+        order_by_created: bool|None = Query(
+            default=None,
+            description="Сортировать задачи по дате создания",
+        ), session = Depends(get_session)):
+    #Пытаемся получить задачу, если не найдено возвращаем ошибку, если найдена
+    tasks = await db_get_all_tasks(session, completed, order_by_created)
+    if tasks is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    else:
+        return tasks
 
-        assert loan.book == book
-        assert loan.member == member
-        assert member.loans[0] == loan
-    except SQLAlchemyError:
-        raise
+@app.delete("/tasks/{task_id}", summary="Удалить задачу")
+#Удалить задачу
+async def delete_task(task_id: int, session = Depends(get_session)):
+    #Пытаемся получить задачу, если не найдено возвращаем ошибку.
+    deleted_task_id = await db_delete_task(session, task_id)
+    if deleted_task_id is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    else:
+        return {"success": "deleted", "task_id": deleted_task_id}
 
 
+@app.put("/task/{task_id}", response_model=TaskOut, summary="Изменить задачу")
+async def edit_task(task: EditTask, task_id: int, session = Depends(get_session)):
+    db_task = await db_get_task(session, task_id)
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
 
-print("Все проверки пройдены ✅")
+    update_task = task.model_dump(exclude_unset=True)
+    new_task = await db_update_task(session, task_id, update_task)
+    if new_task is None:
+        raise HTTPException(status_code=404, detail="New Task not found")
 
-
-
+    else:
+        return new_task
 
 

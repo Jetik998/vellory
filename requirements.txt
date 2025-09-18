@@ -1,1 +1,5 @@
 SQLAlchemy
+fastapi[all]
+aiosqlite
+pydantic
+pytz
