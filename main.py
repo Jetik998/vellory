@@ -1,5 +1,9 @@
+from typing import Annotated
+
 from fastapi import FastAPI, Depends, HTTPException, Query
 from contextlib import asynccontextmanager
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from crud import db_add_task, db_get_task, db_delete_task, db_get_all_tasks, db_update_task
 from database import get_session, init_db
@@ -14,13 +18,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
+SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
 @app.post("/tasks/add_task", summary="Добавить задачу")
 #Добавить задачу
 #При отправке post запроса вызывается функция add_task
-async def add_task(task: AddTask, session = Depends(get_session)):
+async def add_task(task: AddTask, session : SessionDep):
     #Фастапи парсит тело запроса task в объект Pydantic(AddTask)
     #session: передаем через Depends функцию которая возвращает одну сессию
     try:
@@ -34,7 +38,7 @@ async def add_task(task: AddTask, session = Depends(get_session)):
 
 @app.get("/tasks/{task_id}", response_model=TaskOut, summary="Получить задачу по id")
 #Получить задачу
-async def get_task(task_id: int, session = Depends(get_session)):
+async def get_task(task_id: int, session : SessionDep):
     #Пытаемся получить задачу, если не найдено возвращаем ошибку, если найдена
     task = await db_get_task(session, task_id)
     if task is None:
@@ -61,7 +65,7 @@ async def get_all_task(
 
 @app.delete("/tasks/{task_id}", summary="Удалить задачу")
 #Удалить задачу
-async def delete_task(task_id: int, session = Depends(get_session)):
+async def delete_task(task_id: int, session : SessionDep):
     #Пытаемся получить задачу, если не найдено возвращаем ошибку.
     deleted_task_id = await db_delete_task(session, task_id)
     if deleted_task_id is None:

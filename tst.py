@@ -64,8 +64,3 @@ async def main():
             print(e)
 
 asyncio.run(main())
-
-a: int = 5
-b: int = 5
-
-z = a + b
