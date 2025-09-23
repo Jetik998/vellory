@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from models import Task
+from app.models import Task
 
 async def save_and_refresh(session, obj):
     session.add(obj)
