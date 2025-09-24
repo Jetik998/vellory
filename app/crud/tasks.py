@@ -1,16 +1,13 @@
 from sqlalchemy import select
+from app.crud.utils import save_and_refresh
 from app.models import Task
+from app.shemas.tasks import AddTask
 
-async def save_and_refresh(session, obj):
-    session.add(obj)
-    await session.commit()
-    await session.refresh(obj)
-    return obj
 
 #Функция добавления задачи, Создание объекта, добавление в сессию, комит, обновление, возврат id объекта задачи из базы данных
-async def db_add_task(session, task):
-    db_task = Task(**task.dict())
-    db_task = await save_and_refresh(session, db_task)
+async def db_add_task(session, task: AddTask):
+    db_task = Task(**task.model_dump())
+    await save_and_refresh(session, db_task)
     return db_task
 
 #Получить объект задачи из базы данных, по id
@@ -49,6 +46,6 @@ async def db_update_task(session, task_id, task):
     for key, value in task.items(): #Цикл по словарю task из тела запроса
         if value is not None:
             setattr(db_task, key, value)
-    db_task = await save_and_refresh(session, db_task)
+    await save_and_refresh(session, db_task)
     return db_task
 
