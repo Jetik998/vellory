@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from app.crud.users import db_get_user, db_user_exists, db_add_user
-from app.models import User
 from app.security import verify_password
 from app.shemas.users import Register
 from app.dependencies import SessionDep
@@ -22,3 +21,6 @@ async def login(user: Register, session: SessionDep):
     if not db_user:
         raise HTTPException(status_code=400, detail="User not found")
     verify_result = verify_password(user.password, db_user.hashed_password)
+    if not verify_result:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    pass

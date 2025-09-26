@@ -4,3 +4,7 @@ aiosqlite
 pydantic
 pytz
 bcrypt
+pyjwt
+pre-commit
+ruff
+pre-commit
