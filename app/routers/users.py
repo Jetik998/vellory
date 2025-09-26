@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.crud.users import db_get_user, db_user_exists, db_add_user
-from app.security import verify_password
+from security.password import verify_password
 from app.shemas.users import Register
 from app.dependencies import SessionDep
 

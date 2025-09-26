@@ -3,7 +3,7 @@ from sqlalchemy import select, exists
 from app.crud.utils import save_and_refresh
 from app.dependencies import SessionDep
 from app.models import User
-from app.security import hash_password
+from security.password import get_password_hash
 from app.shemas.users import Register
 
 
@@ -23,7 +23,7 @@ async def db_user_exists(username: str, session: SessionDep):
 
 
 async def db_add_user(user: Register, session: SessionDep):
-    hashed_password = hash_password(user.password)
+    hashed_password = get_password_hash(user.password)
     user_dict = user.model_dump(exclude={"password"})
     user_dict["hashed_password"] = hashed_password
     db_user = User(**user_dict)

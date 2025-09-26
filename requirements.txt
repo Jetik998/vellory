@@ -4,8 +4,10 @@ aiosqlite
 pydantic
 pytz
 bcrypt
+passlib[bcrypt]
 pyjwt
 pre-commit
 ruff
 black
 pre-commit
+python-decouple
