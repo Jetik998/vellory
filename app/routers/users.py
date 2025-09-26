@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from app.crud.users import db_get_user, db_user_exists, db_add_user
+from security.jwt import create_token
 from security.password import verify_password
 from app.shemas.users import Register
 from app.dependencies import SessionDep
@@ -10,7 +11,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", summary="Регистрация пользователя")
 async def register(user: Register, session: SessionDep):
-    db_user = db_user_exists(user.username, session)
+    db_user = await db_user_exists(user.username, session)
     if db_user:  # Если db_user не False, значит такой пользователь уже существует
         raise HTTPException(status_code=400, detail="Username already exists")
     await db_add_user(user, session)
@@ -25,4 +26,5 @@ async def login(user: Register, session: SessionDep):
     verify_result = verify_password(user.password, db_user.hashed_password)
     if not verify_result:
         raise HTTPException(status_code=401, detail="Invalid username or password")
-    pass
+    token = create_token(user.id, user.username)
+    return {"access_token": token, "token_type": "bearer"}
