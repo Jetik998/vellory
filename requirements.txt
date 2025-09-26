@@ -7,4 +7,5 @@ bcrypt
 pyjwt
 pre-commit
 ruff
+black
 pre-commit

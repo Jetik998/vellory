@@ -7,9 +7,10 @@ class Base(DeclarativeBase):
     __abstract__ = True
     pass
 
-#Таблица задачи
+
+# Таблица задачи
 class Task(Base):
-    __tablename__ = 'task'
+    __tablename__ = "task"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(nullable=False)
@@ -20,8 +21,9 @@ class Task(Base):
     def __repr__(self):
         return f"Task(id={self.id}, title={self.title}, description={self.description}, created_at={self.created_at}, completed={self.completed})"
 
+
 class User(Base):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(nullable=False, unique=True)

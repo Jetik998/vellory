@@ -4,7 +4,6 @@ from database import init_db
 from app.routers.tasks import router as tasks_router
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # запуск
@@ -17,6 +16,3 @@ app = FastAPI(lifespan=lifespan)
 
 # Подключение роутера задач
 app.include_router(tasks_router)
-
-
-

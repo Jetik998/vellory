@@ -7,6 +7,7 @@ from app.dependencies import SessionDep
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+
 @router.post("/register", summary="Регистрация пользователя")
 async def register(user: Register, session: SessionDep):
     db_user = db_user_exists(user.username, session)
@@ -14,6 +15,7 @@ async def register(user: Register, session: SessionDep):
         raise HTTPException(status_code=400, detail="Username already exists")
     await db_add_user(user, session)
     return {"message": "User created successfully"}
+
 
 @router.post("/login", summary="Вход в систему и выдача токена")
 async def login(user: Register, session: SessionDep):
