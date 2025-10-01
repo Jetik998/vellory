@@ -2,7 +2,7 @@ from sqlalchemy import select, exists
 
 from app.crud.utils import save_and_refresh
 from app.dependencies import SessionDep
-from app.models import User
+from app.models.models import User
 from security.password import get_password_hash
 from app.shemas.users import Register
 
@@ -15,7 +15,7 @@ async def db_get_user(username: str, session: SessionDep):
     return db_user
 
 
-async def db_user_exists(username: str, session: SessionDep):
+async def db_user_exists(username: str, session: SessionDep) -> bool:
     stmt = select(exists().where(User.username == username))
     result = await session.execute(stmt)
     user_exists = result.scalars().first()

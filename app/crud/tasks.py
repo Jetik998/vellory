@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from app.crud.utils import save_and_refresh
-from app.models import Task
+from app.models.models import Task
 from app.shemas.tasks import AddTask
 
 

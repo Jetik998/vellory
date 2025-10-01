@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from database import init_db
+from app.database import init_db
 from app.routers.tasks import router as tasks_router
+from app.routers.users import router as users_router
 
 
 @asynccontextmanager
@@ -16,3 +17,4 @@ app = FastAPI(lifespan=lifespan)
 
 # Подключение роутера задач
 app.include_router(tasks_router)
+app.include_router(users_router)

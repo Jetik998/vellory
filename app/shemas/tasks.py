@@ -9,6 +9,7 @@ class Base(BaseModel):
 
 # Схема добавления задачи
 class AddTask(BaseModel):
+    user_id: int
     title: str
     description: str
     completed: bool | None = None
@@ -20,7 +21,8 @@ class GetTask(BaseModel):
 
 
 # Схема изменения задачи
-class UpdateTask(BaseModel):
+class EditTask(BaseModel):
+    user_id: int | None = None
     title: str | None = None
     description: str | None = None
     completed: bool | None = None
@@ -33,13 +35,8 @@ class DeleteTask(BaseModel):
 
 class TaskOut(Base):
     id: int
+    user_id: int
     title: str
     description: str
     completed: bool
     created_at: datetime
-
-
-class EditTask(BaseModel):
-    title: str | None = None
-    description: str | None = None
-    completed: bool | None = None

@@ -4,7 +4,7 @@ aiosqlite
 pydantic
 pytz
 bcrypt
-passlib[bcrypt]
+pwdlib[argon2]
 pyjwt
 pre-commit
 ruff

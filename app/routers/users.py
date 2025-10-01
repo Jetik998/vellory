@@ -1,30 +1,36 @@
-from fastapi import APIRouter, HTTPException
-from app.crud.users import db_get_user, db_user_exists, db_add_user
-from security.jwt import create_token
-from security.password import verify_password
-from app.shemas.users import Register
-from app.dependencies import SessionDep
+from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi.security import OAuth2PasswordRequestForm
 
+from app.crud.users import db_user_exists, db_add_user
+from app.services.auth import authenticate_user
+from app.shemas.users import Register
+from app.dependencies import SessionDep, FormDataDep
+from security.jwt import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/register", summary="Регистрация пользователя")
 async def register(user: Register, session: SessionDep):
-    db_user = await db_user_exists(user.username, session)
-    if db_user:  # Если db_user не False, значит такой пользователь уже существует
-        raise HTTPException(status_code=400, detail="Username already exists")
+    if await db_user_exists(
+        user.username, session
+    ):  # Если db_user не False, значит такой пользователь уже существует
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already registered",
+        )
     await db_add_user(user, session)
     return {"message": "User created successfully"}
 
 
-@router.post("/login", summary="Вход в систему и выдача токена")
-async def login(user: Register, session: SessionDep):
-    db_user = await db_get_user(user.username, session)
-    if not db_user:
-        raise HTTPException(status_code=400, detail="User not found")
-    verify_result = verify_password(user.password, db_user.hashed_password)
-    if not verify_result:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
-    token = create_token(user.id, user.username)
-    return {"access_token": token, "token_type": "bearer"}
+@router.post("/token", summary="Вход в систему и выдача токена")
+async def login(form_data: FormDataDep, session: SessionDep):
+    user = await authenticate_user(form_data.username, form_data.password, session)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = create_access_token(data={"sub": user.username})
+    return {"access_token": access_token, "token_type": "bearer"}

@@ -1,26 +1,25 @@
 from decouple import config
 from datetime import datetime, timedelta, timezone
 import jwt
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 
 SECRET_KEY = config("SECRET_KEY")
-EXP_MIN = timedelta(config("EXP_MIN"))
+EXP_MIN = timedelta(minutes=int(config("EXP_MIN")))
+ALGORITHM = config("ALGORITHM")
 
 
-def create_token(user_id, username):
-    now = datetime.now(timezone.utc)
-    payload = {
-        "user_id": user_id,
-        "username": username,
-        "exp": now + timedelta(hours=1),  # Токен действителен 1 час
-        "iat": now,
-        "nbf": now,
-    }
-    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-    return token
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
 
 
-def verify_token(token):
+async def verify_token(token):
     try:
         decoded = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         return decoded
