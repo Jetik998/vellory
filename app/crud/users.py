@@ -1,7 +1,7 @@
 from sqlalchemy import select, exists
 
 from app.core.utils import save_and_refresh
-from app.models.models import User
+from app.models import User
 from app.security.password import get_password_hash
 from app.shemas.users import UserRegister
 

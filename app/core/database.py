@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from app.models.models import Base
+from app.models import Base
 
 # Создание асинхронного движка
 engine = create_async_engine("sqlite+aiosqlite:///test.db", echo=True)
