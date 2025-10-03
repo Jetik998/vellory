@@ -1,11 +1,7 @@
-from decouple import config
 from datetime import datetime, timedelta, timezone
 import jwt
 from fastapi import HTTPException
-
-SECRET_KEY = config("SECRET_KEY")
-EXP_MIN = timedelta(minutes=int(config("EXP_MIN")))
-ALGORITHM = config("ALGORITHM")
+from app.core.config import SECRET_KEY, ALGORITHM
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):

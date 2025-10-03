@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import ForeignKey
 
-from app.moscow_time import time
+from app.utils import time
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 

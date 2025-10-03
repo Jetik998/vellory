@@ -1,12 +1,12 @@
 from sqlalchemy import select
-from app.crud.utils import save_and_refresh
+from app.core.utils import save_and_refresh
 from app.models.models import Task
 from app.shemas.tasks import AddTask
 
 
 # Функция добавления задачи, Создание объекта, добавление в сессию, комит, обновление, возврат id объекта задачи из базы данных
-async def db_add_task(session, task: AddTask):
-    db_task = Task(**task.model_dump())
+async def db_add_task(session, task: AddTask, owner_id: int):
+    db_task = Task(**task.model_dump(), user_id=owner_id)
     await save_and_refresh(session, db_task)
     return db_task
 

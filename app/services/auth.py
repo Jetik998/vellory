@@ -1,6 +1,6 @@
 from app.crud.users import db_get_user
-from app.dependencies import SessionDep
-from security.password import verify_password
+from app.core.dependencies import SessionDep
+from app.security.password import verify_password
 
 
 async def authenticate_user(username: str, password: str, session: SessionDep):

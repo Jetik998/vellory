@@ -9,15 +9,29 @@ class Base(BaseModel):
 
 # Схема добавления задачи
 class AddTask(BaseModel):
-    user_id: int
     title: str
     description: str
     completed: bool | None = None
 
 
+# Схема ответа добавления задачи
+class AddTaskResponse(BaseModel):
+    success: bool
+    task_id: int
+
+
 # Схема получения задачи
 class GetTask(BaseModel):
     id: int
+
+
+class GetTaskResponse(Base):
+    id: int
+    user_id: int
+    title: str
+    description: str
+    completed: bool
+    created_at: datetime
 
 
 # Схема изменения задачи
@@ -33,10 +47,6 @@ class DeleteTask(BaseModel):
     id: int
 
 
-class TaskOut(Base):
-    id: int
-    user_id: int
-    title: str
-    description: str
-    completed: bool
-    created_at: datetime
+class DeleteTaskResponse(BaseModel):
+    success: bool
+    task_id: int

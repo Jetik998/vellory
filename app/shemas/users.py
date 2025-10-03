@@ -5,12 +5,20 @@ class Base(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class Register(BaseModel):
+class User(BaseModel):
     username: str
     email: str
     password: str
 
 
-# class Login(BaseModel):
-#     username: str
-#     password: str
+class UserRegister(User):
+    pass
+
+
+class UserRegisterResponse(BaseModel):
+    message: str
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str

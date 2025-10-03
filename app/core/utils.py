@@ -1,7 +1,4 @@
-from app.dependencies import SessionDep
-
-
-async def save_and_refresh(session: SessionDep, obj):
+async def save_and_refresh(session, obj):
     session.add(obj)
     try:
         await session.commit()

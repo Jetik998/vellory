@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
+
 from app.crud.tasks import (
     db_add_task,
     db_get_task,
@@ -6,21 +7,27 @@ from app.crud.tasks import (
     db_get_all_tasks,
     db_update_task,
 )
-from app.shemas.tasks import AddTask, TaskOut, EditTask
-from app.dependencies import SessionDep
-
+from app.shemas.tasks import (
+    AddTask,
+    GetTaskResponse,
+    EditTask,
+    AddTaskResponse,
+    DeleteTaskResponse,
+)
+from app.core.dependencies import SessionDep, CurrentUserDep
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
-@router.post("/add_task", summary="Добавить задачу")
+@router.post("/add_task", summary="Добавить задачу", response_model=AddTaskResponse)
 # При отправке post запроса вызывается функция add_task
-async def add_task(task: AddTask, session: SessionDep):
-    # Фастапи парсит тело запроса task в объект Pydantic(AddTask)
-    # session: передаем через Depends функцию которая возвращает одну сессию
+async def add_task(
+    task: AddTask,
+    session: SessionDep,
+    user: CurrentUserDep,
+):
     try:
-        # Пытаемся добавить задачу, если все ок возвращаем id добавленой задачи, если нет вызываем ошибку
-        task = await db_add_task(session, task)
+        task = await db_add_task(session, task, owner_id=user.id)
         return {"success": True, "task_id": task.id}
     except ValueError as e:  # ошибка клиента
         raise HTTPException(status_code=400, detail=str(e))
@@ -28,7 +35,9 @@ async def add_task(task: AddTask, session: SessionDep):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.get("/{task_id}", response_model=TaskOut, summary="Получить задачу по id")
+@router.get(
+    "/{task_id}", summary="Получить задачу по id", response_model=GetTaskResponse
+)
 # Получить задачу
 async def get_task(task_id: int, session: SessionDep):
     # Пытаемся получить задачу, если не найдено возвращаем ошибку, если найдена
@@ -39,7 +48,7 @@ async def get_task(task_id: int, session: SessionDep):
         return task
 
 
-@router.get("/", response_model=list[TaskOut], summary="Получить все задачи")
+@router.get("/", response_model=list[GetTaskResponse], summary="Получить все задачи")
 # Получить все задачи
 async def get_all_task(
     session: SessionDep,
@@ -60,7 +69,9 @@ async def get_all_task(
         return tasks
 
 
-@router.delete("/{task_id}", summary="Удалить задачу")
+@router.delete(
+    "/{task_id}", summary="Удалить задачу", response_model=DeleteTaskResponse
+)
 # Удалить задачу
 async def delete_task(task_id: int, session: SessionDep):
     # Пытаемся получить задачу, если не найдено возвращаем ошибку.
@@ -71,7 +82,9 @@ async def delete_task(task_id: int, session: SessionDep):
         return {"success": "deleted", "task_id": deleted_task_id}
 
 
-@router.put("/task/{task_id}", response_model=TaskOut, summary="Изменить задачу")
+@router.put(
+    "/task/{task_id}", summary="Изменить задачу", response_model=GetTaskResponse
+)
 async def edit_task(task: EditTask, task_id: int, session: SessionDep):
     db_task = await db_get_task(session, task_id)
     if db_task is None:
