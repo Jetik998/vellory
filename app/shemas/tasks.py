@@ -8,19 +8,55 @@ class Base(BaseModel):
     model_config = {"from_attributes": True}
 
 
-# Схема добавления задачи
-class TaskCreate(BaseModel):
+class BaseTask(BaseModel):
     title: Annotated[
-        str, Field(..., min_length=1, max_length=100, description="Название задачи")
+        str,
+        Field(
+            ...,
+            min_length=1,
+            max_length=100,
+            description="Название задачи",
+            examples=["Купить продукты"],
+        ),
     ]
     description: Annotated[
         str | None,
         Field(
-            default=None, min_length=1, max_length=100, description="Описание задачи"
+            default=None,
+            min_length=1,
+            max_length=100,
+            description="Описание задачи",
+            examples=["Купить молоко, хлеб и яйца в магазине"],
         ),
     ]
     completed: Annotated[
-        bool | None, Field(default=None, description="Статус выполнения")
+        bool | None,
+        Field(default=False, description="Статус выполнения", examples=[True, False]),
+    ]
+
+
+class TaskCreate(BaseTask):
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "title": "Купить продукты",
+                    "description": "Купить молоко, хлеб и яйца в магазине",
+                    "completed": False,
+                }
+            ],
+            "x-test-info": "Это тестовое поле. Здесь можно добавлять любые свои данные для экспериментов.",
+        }
+    }
+
+
+class TaskResponse(TaskCreate):
+    id: Annotated[int, Field(..., ge=1, description="ID задачи", examples=[1])]
+    created_at: Annotated[
+        datetime,
+        Field(
+            ..., description="Дата и время создания", examples=["2025-10-08T14:30:00"]
+        ),
     ]
 
 
@@ -33,14 +69,6 @@ class CreateTaskResponse(BaseModel):
 # Схема получения задачи
 class GetTask(BaseModel):
     id: int
-
-
-class TaskResponse(Base):
-    id: Annotated[int, Field(..., description="ID задачи")]
-    title: Annotated[str, Field(..., description="Название задачи")]
-    description: Annotated[str, Field(..., description="Описание задачи")]
-    completed: Annotated[bool, Field(..., description="Статус выполнения")]
-    created_at: Annotated[datetime, Field(..., description="Дата и время создания")]
 
 
 # Схема изменения задачи

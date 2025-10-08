@@ -55,21 +55,17 @@ async def create_task(
 
 @router.get(
     "/{task_id}",
-    response_model=TaskResponse,
     status_code=status.HTTP_200_OK,
     summary="Получить задачу по ID",
 )
 async def get_task(
     task_id: Annotated[
         int,
-        Path(
-            title="ID задачи",
-            ge=0,
-        ),
+        Path(title="ID задачи", ge=0, examples=[0, 1, 2]),
     ],
     session: SessionDep,
     user: CurrentUserDep,
-):
+) -> TaskResponse:
     """
     Возвращает задачу по ID для текущего пользователя.
 
