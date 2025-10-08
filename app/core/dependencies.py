@@ -32,7 +32,9 @@ async def get_current_user(token: TokenDep, session: SessionDep):
         raise credentials_exception
     user = await db_get_user(token_data.username, session)
     if user is None:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
     return user
 
 

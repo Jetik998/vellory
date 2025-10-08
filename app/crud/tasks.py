@@ -1,39 +1,38 @@
 from sqlalchemy import select
 from app.core.utils import save_and_refresh
 from app.models import Task
-from app.shemas.tasks import AddTask
+from app.shemas.tasks import TaskCreate
 
 
 # Функция добавления задачи, Создание объекта, добавление в сессию, комит, обновление, возврат id объекта задачи из базы данных
-async def db_add_task(session, task: AddTask, owner_id: int):
+async def db_create_task(session, task: TaskCreate, owner_id: int):
     db_task = Task(**task.model_dump(), user_id=owner_id)
     await save_and_refresh(session, db_task)
     return db_task
 
 
-# Получить объект задачи из базы данных, по id
-async def db_get_task(session, task_id: int):
-    # Получаем строку из БД
-    task = await session.get(Task, task_id)
-    # Возвращаем объект
-    return task
+async def db_get_task(session, task_id: int, owner_id: int):
+    stmt = select(Task).where(Task.id == task_id, Task.user_id == owner_id)
+    result = await session.execute(stmt)
+    return result.scalar_one_or_none()
 
 
 # Удалить объект задачи из базы данных, по id
-async def db_delete_task(session, task_id: int):
+async def db_delete_task(session, task_id: int, owner_id: int):
     # Получаем строку из БД
-    task = await session.get(Task, task_id)
+    stmt = select(Task).where(Task.id == task_id, Task.user_id == owner_id)
+    result = await session.execute(stmt)
+    task = result.scalar_one_or_none()
     if task is None:
         return None
 
-    task_id = task.id
     await session.delete(task)
     await session.commit()
     return task_id
 
 
-async def db_get_all_tasks(session, completed, order_by_created):
-    stmt = select(Task)
+async def db_get_all_tasks(session, completed, order_by_created, user_id):
+    stmt = select(Task).where(Task.user_id == user_id)
 
     if order_by_created:
         stmt = stmt.order_by(Task.created_at)

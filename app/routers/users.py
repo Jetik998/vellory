@@ -13,9 +13,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
     "/register", summary="Регистрация пользователя", response_model=UserRegisterResponse
 )
 async def register(user: UserRegister, session: SessionDep):
-    if await db_user_exists(
-        user.username, session
-    ):  # Если db_user не False, значит такой пользователь уже существует
+    if await db_user_exists(user.username, session):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",

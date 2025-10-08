@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Annotated
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Base(BaseModel):
@@ -8,14 +9,23 @@ class Base(BaseModel):
 
 
 # Схема добавления задачи
-class AddTask(BaseModel):
-    title: str
-    description: str
-    completed: bool | None = None
+class TaskCreate(BaseModel):
+    title: Annotated[
+        str, Field(..., min_length=1, max_length=100, description="Название задачи")
+    ]
+    description: Annotated[
+        str | None,
+        Field(
+            default=None, min_length=1, max_length=100, description="Описание задачи"
+        ),
+    ]
+    completed: Annotated[
+        bool | None, Field(default=None, description="Статус выполнения")
+    ]
 
 
 # Схема ответа добавления задачи
-class AddTaskResponse(BaseModel):
+class CreateTaskResponse(BaseModel):
     success: bool
     task_id: int
 
@@ -25,18 +35,16 @@ class GetTask(BaseModel):
     id: int
 
 
-class GetTaskResponse(Base):
-    id: int
-    user_id: int
-    title: str
-    description: str
-    completed: bool
-    created_at: datetime
+class TaskResponse(Base):
+    id: Annotated[int, Field(..., description="ID задачи")]
+    title: Annotated[str, Field(..., description="Название задачи")]
+    description: Annotated[str, Field(..., description="Описание задачи")]
+    completed: Annotated[bool, Field(..., description="Статус выполнения")]
+    created_at: Annotated[datetime, Field(..., description="Дата и время создания")]
 
 
 # Схема изменения задачи
 class EditTask(BaseModel):
-    user_id: int | None = None
     title: str | None = None
     description: str | None = None
     completed: bool | None = None
@@ -49,4 +57,4 @@ class DeleteTask(BaseModel):
 
 class DeleteTaskResponse(BaseModel):
     success: bool
-    task_id: int
+    task_id: int | None = None
