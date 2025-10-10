@@ -18,11 +18,6 @@ class UserInDB(UserBase):
     hashed_password: str
 
 
-class TokenResponse(BaseModel):
-    access_token: str
-    token_type: str
-
-
 class UserRegisterResponse(BaseModel):
     username: str
     message: str

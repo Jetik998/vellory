@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 from app.crud.users import db_user_exists, db_add_user
 from app.services.auth import authenticate_user
-from app.shemas.users import UserIn, UserRegisterResponse, TokenResponse
+from app.shemas.users import UserIn, UserRegisterResponse
+from app.shemas.auth import TokenResponse
 from app.core.dependencies import SessionDep, FormDataDep
 from app.security.jwt import create_access_token
 
