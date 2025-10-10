@@ -3,7 +3,7 @@ from sqlalchemy import select, exists
 from app.core.utils import save_and_refresh
 from app.models import User
 from app.security.password import get_password_hash
-from app.shemas.users import UserRegister
+from app.shemas.users import UserRegister, UserInDB
 
 
 # Получить пользователя из базы данных, по username
@@ -23,8 +23,7 @@ async def db_user_exists(username: str, session) -> bool:
 
 async def db_add_user(user: UserRegister, session):
     hashed_password = get_password_hash(user.password)
-    user_dict = user.model_dump(exclude={"password"})
-    user_dict["hashed_password"] = hashed_password
-    db_user = User(**user_dict)
+    db_user_model = UserInDB(**user.model_dump(), hashed_password=hashed_password)
+    db_user = User(**db_user_model.model_dump())
     await save_and_refresh(session, db_user)
     return db_user

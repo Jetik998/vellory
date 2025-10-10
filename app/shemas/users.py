@@ -5,14 +5,17 @@ class Base(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class User(BaseModel):
+class UserBase(BaseModel):
     username: str
     email: str
+
+
+class UserRegister(UserBase):
     password: str
 
 
-class UserRegister(User):
-    pass
+class UserInDB(UserBase):
+    hashed_password: str
 
 
 class UserRegisterResponse(BaseModel):

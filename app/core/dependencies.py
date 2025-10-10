@@ -7,8 +7,8 @@ from typing import Annotated
 from app.core.config import SECRET_KEY, ALGORITHM
 from app.core.database import get_session
 from app.crud.users import db_get_user
+from app.models import User
 from app.shemas.auth import TokenData
-from app.shemas.users import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
