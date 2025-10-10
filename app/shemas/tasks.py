@@ -4,21 +4,16 @@ from typing import Annotated
 from pydantic import BaseModel, Field
 
 
-class Base(BaseModel):
+class ResponseBase(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class BaseTask(BaseModel):
-    title: Annotated[
-        str,
-        Field(
-            ...,
-            min_length=1,
-            max_length=100,
-            description="Название задачи",
-            examples=["Купить продукты"],
-        ),
-    ]
+class TaskID(BaseModel):
+    id: Annotated[int, Field(..., ge=1, description="ID задачи", examples=[1])]
+
+
+class TaskBase(BaseModel):
+    title: str | None = None
     description: Annotated[
         str | None,
         Field(
@@ -35,7 +30,18 @@ class BaseTask(BaseModel):
     ]
 
 
-class TaskCreate(BaseTask):
+class TaskCreate(TaskBase):
+    title: Annotated[
+        str,
+        Field(
+            ...,
+            min_length=1,
+            max_length=100,
+            description="Название задачи",
+            examples=["Купить продукты"],
+        ),
+    ]
+
     model_config = {
         "json_schema_extra": {
             "examples": [
@@ -50,8 +56,7 @@ class TaskCreate(BaseTask):
     }
 
 
-class TaskResponse(TaskCreate):
-    id: Annotated[int, Field(..., ge=1, description="ID задачи", examples=[1])]
+class TaskResponse(TaskID, TaskCreate):
     created_at: Annotated[
         datetime,
         Field(
@@ -60,29 +65,17 @@ class TaskResponse(TaskCreate):
     ]
 
 
-# Схема ответа добавления задачи
-class CreateTaskResponse(BaseModel):
+class CreateTaskResponse(TaskID):
     success: bool
-    task_id: int
 
 
-# Схема получения задачи
-class GetTask(BaseModel):
-    id: int
+class GetTask(TaskID):
+    pass
 
 
-# Схема изменения задачи
-class EditTask(BaseModel):
-    title: str | None = None
-    description: str | None = None
-    completed: bool | None = None
+class EditTask(TaskBase):
+    pass
 
 
-# Схема удаления задачи
-class DeleteTask(BaseModel):
-    id: int
-
-
-class DeleteTaskResponse(BaseModel):
-    success: bool
-    task_id: int | None = None
+class DeleteTask(TaskID):
+    pass

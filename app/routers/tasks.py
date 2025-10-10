@@ -14,7 +14,6 @@ from app.shemas.tasks import (
     TaskResponse,
     EditTask,
     CreateTaskResponse,
-    DeleteTaskResponse,
 )
 from app.core.dependencies import SessionDep, CurrentUserDep
 

@@ -1,8 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
-
 from app.crud.users import db_user_exists, db_add_user
 from app.services.auth import authenticate_user
-from app.shemas.users import UserRegister, UserRegisterResponse, TokenResponse
+from app.shemas.users import UserIn, UserRegisterResponse, TokenResponse
 from app.core.dependencies import SessionDep, FormDataDep
 from app.security.jwt import create_access_token
 
@@ -10,16 +9,20 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post(
-    "/register", summary="Регистрация пользователя", response_model=UserRegisterResponse
+    "/register",
+    summary="Регистрация пользователя",
+    status_code=status.HTTP_201_CREATED,
 )
-async def register(user: UserRegister, session: SessionDep):
+async def register(user: UserIn, session: SessionDep) -> UserRegisterResponse:
     if await db_user_exists(user.username, session):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
         )
     await db_add_user(user, session)
-    return {"message": "User created successfully"}
+    return UserRegisterResponse(
+        username=user.username, message="User registered successfully"
+    )
 
 
 @router.post(
