@@ -29,7 +29,7 @@ async def register(user: UserIn, session: SessionDep) -> UserRegisterResponse:
 @router.post(
     "/token", summary="Вход в систему и выдача токена", response_model=TokenResponse
 )
-async def login(form_data: FormDataDep, session: SessionDep):
+async def login(form_data: FormDataDep, session: SessionDep) -> TokenResponse:
     user = await authenticate_user(form_data.username, form_data.password, session)
     if not user:
         raise HTTPException(
@@ -38,4 +38,4 @@ async def login(form_data: FormDataDep, session: SessionDep):
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return TokenResponse(access_token=access_token, token_type="bearer")
