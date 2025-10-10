@@ -21,3 +21,8 @@ class UserInDB(UserBase):
 class UserRegisterResponse(BaseModel):
     username: str
     message: str
+
+
+class AvatarUpdateResponse(BaseModel):
+    message: str
+    avatar_url: str

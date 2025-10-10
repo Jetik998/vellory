@@ -34,6 +34,7 @@ class User(Base):
     username: Mapped[str] = mapped_column(nullable=False, unique=True)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
+    avatar: Mapped[str | None] = mapped_column(nullable=True)
     tasks: Mapped[list["Task"]] = relationship(back_populates="user")
 
     def __repr__(self):

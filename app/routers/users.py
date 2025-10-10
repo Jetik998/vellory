@@ -1,9 +1,14 @@
-from fastapi import APIRouter, HTTPException, status
-from app.crud.users import db_user_exists, db_add_user
+from fastapi import APIRouter, HTTPException, status, UploadFile, File, Request
+from app.crud.users import (
+    db_user_exists,
+    db_add_user,
+    db_get_user,
+    db_update_user_avatar,
+)
 from app.services.auth import authenticate_user
-from app.shemas.users import UserIn, UserRegisterResponse
+from app.shemas.users import UserIn, UserRegisterResponse, AvatarUpdateResponse
 from app.shemas.auth import TokenResponse
-from app.core.dependencies import SessionDep, FormDataDep
+from app.core.dependencies import SessionDep, FormDataDep, CurrentUserDep
 from app.security.jwt import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -39,3 +44,23 @@ async def login(form_data: FormDataDep, session: SessionDep) -> TokenResponse:
         )
     access_token = create_access_token(data={"sub": user.username})
     return TokenResponse(access_token=access_token, token_type="bearer")
+
+
+@router.post(
+    "/avatar",
+    summary="Загрузка аватара",
+    status_code=status.HTTP_201_CREATED,
+    response_model=AvatarUpdateResponse,
+)
+async def upload_avatar(
+    request: Request,
+    user: CurrentUserDep,
+    session: SessionDep,
+    file: UploadFile = File(...),
+) -> AvatarUpdateResponse:
+    base_url = str(request.base_url).rstrip("/")
+    db_user = await db_get_user(user.username, session)
+    updated_user = await db_update_user_avatar(file, db_user, session)
+    return AvatarUpdateResponse(
+        message="Avatar updated", avatar_url=f"{base_url}/avatars/{updated_user.avatar}"
+    )
