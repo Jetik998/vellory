@@ -11,7 +11,7 @@ async def db_create_task(session, task: TaskCreate, owner_id: int):
     return db_task
 
 
-async def db_get_task(session, task_id: int, owner_id: int):
+async def db_get_task(session, task_id: int, owner_id: int ):
     stmt = select(Task).where(Task.id == task_id, Task.user_id == owner_id)
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
@@ -44,8 +44,8 @@ async def db_get_all_tasks(session, completed, order_by_created, user_id):
     return users
 
 
-async def db_update_task(session, task_id, task):
-    db_task = await db_get_task(session, task_id)  # Получили задачу по id
+async def db_update_task(session, task_id, task, user_id):
+    db_task = await db_get_task(session, task_id, user_id)  # Получили задачу по id
     for key, value in task.items():  # Цикл по словарю task из тела запроса
         if value is not None:
             setattr(db_task, key, value)

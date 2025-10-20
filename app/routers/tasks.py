@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status, Path
 
+from app.core.utils import save_and_refresh
 from app.crud.tasks import (
     db_create_task,
     db_get_task,
@@ -128,7 +129,7 @@ async def delete_task(task_id: int, session: SessionDep, user: CurrentUserDep):
         return {"success": True, "task_id": deleted_task_id}
 
 
-@router.put("/task/{task_id}", summary="Изменить задачу", response_model=TaskResponse)
+@router.patch("/task/{task_id}/old", summary="Изменить задачу", response_model=TaskResponse, deprecated=True)
 async def edit_task(
     task: EditTask, task_id: int, session: SessionDep, user: CurrentUserDep
 ):
@@ -137,7 +138,25 @@ async def edit_task(
         raise HTTPException(status_code=404, detail="Task not found")
 
     update_task = task.model_dump(exclude_unset=True)
-    new_task = await db_update_task(session, task_id, update_task)
+    new_task = await db_update_task(session, task_id, update_task, user.id)
+    if new_task is None:
+        raise HTTPException(status_code=404, detail="New Task not found")
+
+    else:
+        return new_task
+
+@router.patch("/task/{task_id}", summary="Изменить задачу", response_model=TaskResponse)
+async def edit_task(
+    task: EditTask, task_id: int, session: SessionDep, user: CurrentUserDep
+):
+    db_task = await db_get_task(session, task_id, user.id)
+    if db_task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    update_data = task.model_dump(exclude_unset=True)
+    update_task = db_task.model_copy(update=update_data)
+    new_task = await save_and_refresh(session, update_task)
+
     if new_task is None:
         raise HTTPException(status_code=404, detail="New Task not found")
 
