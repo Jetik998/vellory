@@ -52,6 +52,15 @@ async def create_task(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
+@router.post(
+    "/deprecated_create_task",
+    summary="Этот эндпоинт устарел",
+    deprecated=True  # <--- пометка, что эндпоинт устарел
+)
+async def create_task():
+    return {"message": "Этот эндпоинт устарел, используйте новый "}
+
+
 @router.get(
     "/{task_id}",
     status_code=status.HTTP_200_OK,
