@@ -27,6 +27,7 @@ router = APIRouter(prefix="/tasks", tags=[Tags.items])
     response_model=CreateTaskResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Добавить задачу",
+    response_description="Задача создана"
 )
 async def create_task(
     task: TaskCreate,
@@ -34,18 +35,20 @@ async def create_task(
     user: CurrentUserDep,
 ):
     """
-    Создаёт новую задачу для текущего пользователя.
+    **Создаёт новую задачу для текущего пользователя.**
 
-    Args:
-        task (TaskCreate): Данные новой задачи.
-        session (SessionDep): Сессия базы данных.
-        user (CurrentUserDep): Текущий авторизованный пользователь.
+    ---
 
-    Returns:
-        dict: Статус выполнения и ID созданной задачи.
+    **Args:**
+    - `task` (TaskCreate): Данные новой задачи.
+    - `session` (SessionDep): Сессия базы данных.
+    - `user` (CurrentUserDep): Текущий авторизованный пользователь.
 
-    Raises:
-        HTTPException: 500 — внутренняя ошибка сервера при создании задачи.
+    **Returns:**
+    - `dict`: Статус выполнения и ID созданной задачи.
+
+    **Raises:**
+    - `HTTPException`: 500 — внутренняя ошибка сервера при создании задачи.
     """
     try:
         task = await db_create_task(session, task, owner_id=user.id)
@@ -77,19 +80,22 @@ async def get_task(
     user: CurrentUserDep,
 ) -> TaskResponse:
     """
-    Возвращает задачу по ID для текущего пользователя.
+    **Возвращает задачу по ID для текущего пользователя.**
 
-    Args:
-        task_id (int): Уникальный идентификатор задачи.
-        session (SessionDep): Сессия базы данных.
-        user (CurrentUserDep): Текущий авторизованный пользователь.
+    ---
 
-    Returns:
-        TaskResponse: Объект задачи.
+    **Args:**
+    - `task_id` (int): Уникальный идентификатор задачи.
+    - `session` (SessionDep): Сессия базы данных.
+    - `user` (CurrentUserDep): Текущий авторизованный пользователь.
 
-    Raises:
-        HTTPException: 404 — если задача не найдена.
+    **Returns:**
+    - `TaskResponse`: Объект задачи.
+
+    **Raises:**
+    - `HTTPException`: 404 — если задача не найдена.
     """
+
     task = await db_get_task(session, task_id, owner_id=user.id)
     if task is None:
         raise HTTPException(status_code=404, detail="Task not found")
