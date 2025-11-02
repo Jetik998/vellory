@@ -5,13 +5,15 @@ from app.crud.users import (
     db_get_user,
     db_update_user_avatar,
 )
+from app.enums import Tags
+
 from app.services.auth import authenticate_user
 from app.shemas.users import UserIn, UserRegisterResponse, AvatarUpdateResponse
 from app.shemas.auth import TokenResponse
 from app.core.dependencies import SessionDep, FormDataDep, CurrentUserDep
 from app.security.jwt import create_access_token
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=[Tags.auth])
 
 
 @router.post(

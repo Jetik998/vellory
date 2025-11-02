@@ -10,6 +10,7 @@ from app.crud.tasks import (
     db_get_all_tasks,
     db_update_task,
 )
+from app.enums import Tags
 from app.shemas.tasks import (
     TaskCreate,
     TaskResponse,
@@ -18,7 +19,7 @@ from app.shemas.tasks import (
 )
 from app.core.dependencies import SessionDep, CurrentUserDep
 
-router = APIRouter(prefix="/tasks", tags=["tasks"])
+router = APIRouter(prefix="/tasks", tags=[Tags.items])
 
 
 @router.post(
