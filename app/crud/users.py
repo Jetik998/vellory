@@ -16,11 +16,15 @@ async def db_get_user(username: str, session):
     return db_user
 
 
-async def db_user_exists(username: str, session) -> bool:
+async def db_user_name_exists(username: str, session) -> bool:
     stmt = select(exists().where(User.username == username))
     result = await session.execute(stmt)
-    user_exists = result.scalars().first()
-    return user_exists
+    return result.scalars().first()
+
+async def db_user_email_exists(user_email: str, session) -> bool:
+    stmt = select(exists().where(User.email == user_email))
+    result = await session.execute(stmt)
+    return result.scalars().first()
 
 
 async def db_add_user(user: UserIn, session):

@@ -52,7 +52,8 @@ async def create_task(
     """
     try:
         task = await db_create_task(session, task, owner_id=user.id)
-        return {"success": True, "task_id": task.id}
+        return {"id": task.id, "success": True}
+
     except Exception:
         raise HTTPException(status_code=500, detail="Internal server error")
 

@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Request
 from app.crud.users import (
-    db_user_exists,
     db_add_user,
     db_get_user,
-    db_update_user_avatar,
+    db_update_user_avatar, db_user_email_exists, db_user_name_exists,
 )
 from app.enums import Tags
 
@@ -22,11 +21,17 @@ router = APIRouter(prefix="/auth", tags=[Tags.auth])
     status_code=status.HTTP_201_CREATED,
 )
 async def register(user: UserIn, session: SessionDep) -> UserRegisterResponse:
-    if await db_user_exists(user.username, session):
+    if await db_user_name_exists(user.username, session):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered",
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User with this username or email already exists",
         )
+    if await db_user_email_exists(str(user.email), session):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User with this username or email already exists",
+        )
+
     await db_add_user(user, session)
     return UserRegisterResponse(
         username=user.username, message="User registered successfully"
