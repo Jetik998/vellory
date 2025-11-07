@@ -1,4 +1,4 @@
-from app.core.dependencies import CurrentUserDep, SessionDep
+from app.api.dependencies import CurrentUserDep, SessionDep
 from app.crud.users import db_get_user, db_update_user_avatar
 from app.enums import Tags
 from app.schemas.users import AvatarUpdateResponse

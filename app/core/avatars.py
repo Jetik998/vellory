@@ -2,7 +2,7 @@ from pathlib import Path
 from fastapi import UploadFile, HTTPException
 import aiofiles
 
-AVATAR_DIR = Path(__file__).resolve().parent.parent / "avatars"
+AVATAR_DIR = Path(__file__).resolve().parent.parent / "media" / "avatars"
 AVATAR_DIR.mkdir(exist_ok=True)
 
 

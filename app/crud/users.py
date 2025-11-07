@@ -1,7 +1,7 @@
 from fastapi import HTTPException, UploadFile
 from sqlalchemy import select, exists
 
-from app.core.files import save_avatar_file
+from app.core.avatars import save_avatar_file
 from app.core.utils import save_and_refresh
 from app.models import User
 from app.security.password import get_password_hash

@@ -17,7 +17,7 @@ from app.schemas.tasks import (
     EditTask,
     CreateTaskResponse,
 )
-from app.core.dependencies import SessionDep, CurrentUserDep
+from app.api.dependencies import SessionDep, CurrentUserDep
 
 router = APIRouter(prefix="/tasks", tags=[Tags.items])
 

@@ -1,15 +1,14 @@
-from fastapi import APIRouter, HTTPException, status, UploadFile, File, Request
+from fastapi import APIRouter, HTTPException, status
 from app.crud.users import (
     db_add_user,
-    db_get_user,
-    db_update_user_avatar, db_user_email_exists, db_user_name_exists,
+    db_user_email_exists, db_user_name_exists,
 )
 from app.enums import Tags
 
 from app.security.auth import authenticate_user
-from app.schemas.users import UserIn, UserRegisterResponse, AvatarUpdateResponse
+from app.schemas.users import UserIn, UserRegisterResponse
 from app.schemas.auth import TokenResponse
-from app.core.dependencies import SessionDep, FormDataDep, CurrentUserDep
+from app.api.dependencies import SessionDep, FormDataDep
 from app.security.jwt import create_access_token
 
 router = APIRouter(prefix="/auth", tags=[Tags.auth])

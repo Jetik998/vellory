@@ -1,5 +1,5 @@
 from app.crud.users import db_get_user
-from app.core.dependencies import SessionDep
+from app.api.dependencies import SessionDep
 from app.security.password import verify_password
 
 
