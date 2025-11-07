@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from app.core.utils import save_and_refresh
 from app.models import Task
-from app.shemas.tasks import TaskCreate
+from app.schemas.tasks import TaskCreate
 
 
 # Функция добавления задачи, Создание объекта, добавление в сессию, комит, обновление, возврат id объекта задачи из базы данных

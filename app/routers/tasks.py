@@ -11,7 +11,7 @@ from app.crud.tasks import (
     db_update_task,
 )
 from app.enums import Tags
-from app.shemas.tasks import (
+from app.schemas.tasks import (
     TaskCreate,
     TaskResponse,
     EditTask,
