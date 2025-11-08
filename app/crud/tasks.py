@@ -11,7 +11,7 @@ async def db_create_task(session, task: TaskCreate, owner_id: int):
     return db_task
 
 
-async def db_get_task(session, task_id: int, owner_id: int ):
+async def db_get_task(session, task_id: int, owner_id: int):
     stmt = select(Task).where(Task.id == task_id, Task.user_id == owner_id)
     result = await session.execute(stmt)
     return result.scalar_one_or_none()

@@ -6,8 +6,9 @@ from fastapi import APIRouter, status, UploadFile, File, Request
 
 router = APIRouter(prefix="/users", tags=[Tags.users])
 
+
 @router.post(
-    "/avatar",
+    "/upload/avatar",
     summary="Загрузка аватара",
     status_code=status.HTTP_201_CREATED,
     response_model=AvatarUpdateResponse,

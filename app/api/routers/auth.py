@@ -1,8 +1,4 @@
 from fastapi import APIRouter, HTTPException, status
-from app.crud.users import (
-    db_add_user,
-    db_user_email_exists, db_user_name_exists,
-)
 from app.enums import Tags
 
 from app.security.auth import authenticate_user
@@ -10,8 +6,9 @@ from app.schemas.users import UserIn, UserRegisterResponse
 from app.schemas.auth import TokenResponse
 from app.api.dependencies import SessionDep, FormDataDep
 from app.security.jwt import create_access_token
+from app.services.users import register_user
 
-router = APIRouter(prefix="/auth", tags=[Tags.auth])
+router = APIRouter(prefix="/api/auth", tags=[Tags.auth])
 
 
 @router.post(
@@ -20,21 +17,7 @@ router = APIRouter(prefix="/auth", tags=[Tags.auth])
     status_code=status.HTTP_201_CREATED,
 )
 async def register(user: UserIn, session: SessionDep) -> UserRegisterResponse:
-    if await db_user_name_exists(user.username, session):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="User with this username or email already exists",
-        )
-    if await db_user_email_exists(str(user.email), session):
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="User with this username or email already exists",
-        )
-
-    await db_add_user(user, session)
-    return UserRegisterResponse(
-        username=user.username, message="User registered successfully"
-    )
+    return await register_user(user, session)
 
 
 @router.post(

@@ -19,7 +19,7 @@ from app.schemas.tasks import (
 )
 from app.api.dependencies import SessionDep, CurrentUserDep
 
-router = APIRouter(prefix="/tasks", tags=[Tags.items])
+router = APIRouter(prefix="/api/tasks", tags=[Tags.items])
 
 
 @router.post(
@@ -27,7 +27,7 @@ router = APIRouter(prefix="/tasks", tags=[Tags.items])
     response_model=CreateTaskResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Добавить задачу",
-    response_description="Задача создана"
+    response_description="Задача создана",
 )
 async def create_task(
     task: TaskCreate,
@@ -61,7 +61,7 @@ async def create_task(
 @router.post(
     "/deprecated_create_task",
     summary="Этот эндпоинт устарел",
-    deprecated=True  # <--- пометка, что эндпоинт устарел
+    deprecated=True,  # <--- пометка, что эндпоинт устарел
 )
 async def create_task():
     return {"message": "Этот эндпоинт устарел, используйте новый "}
@@ -137,7 +137,12 @@ async def delete_task(task_id: int, session: SessionDep, user: CurrentUserDep):
         return {"success": True, "task_id": deleted_task_id}
 
 
-@router.patch("/task/{task_id}/old", summary="Изменить задачу", response_model=TaskResponse, deprecated=True)
+@router.patch(
+    "/task/{task_id}/old",
+    summary="Изменить задачу",
+    response_model=TaskResponse,
+    deprecated=True,
+)
 async def edit_task(
     task: EditTask, task_id: int, session: SessionDep, user: CurrentUserDep
 ):
@@ -152,6 +157,7 @@ async def edit_task(
 
     else:
         return new_task
+
 
 @router.patch("/task/{task_id}", summary="Изменить задачу", response_model=TaskResponse)
 async def edit_task(
