@@ -1,8 +1,10 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.models import Base
 
+DATABASE_URL = "postgresql+asyncpg://jet:123@localhost:5432/jet_db"
+
 # Создание асинхронного движка
-engine = create_async_engine("sqlite+aiosqlite:///test.db", echo=True)
+engine = create_async_engine(DATABASE_URL, echo=True)
 # Создание фабрики сессий, до ручного коммита данные не применяются
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 

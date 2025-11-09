@@ -1,60 +1,28 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import APIRouter, Request
+from starlette.responses import FileResponse, RedirectResponse
 
 from app.api.dependencies import SessionDep
+from app.core.config import BASE_DIR
 from app.enums import Tags
-from app.schemas.users import UserIn
-from app.services.users import register_user
+from app.web.services.auth import verify_token_cookie
 
-web_router = APIRouter(tags=[Tags.web])
-templates = Jinja2Templates(directory="app/web/templates")
-
-UserDep = Annotated[UserIn, Form()]
+router = APIRouter(tags=[Tags.web])
+WEB_DIR = BASE_DIR / "app" / "web" / "templates"
+TEMPLATES = BASE_DIR / WEB_DIR
 
 
-@web_router.get("/", response_class=HTMLResponse, summary="Добро пожаловать")
-async def home(request: Request):
-    return templates.TemplateResponse("home.html", {"request": request})
+@router.get("/")
+async def home(request: Request, session: SessionDep):
+    token = request.cookies.get("access_token")
+    user = await verify_token_cookie(token, session)
+    if user:
+        return FileResponse(TEMPLATES / "index.html")
+    return FileResponse(TEMPLATES / "login.html")
 
 
-@web_router.get(
-    "/register", response_class=HTMLResponse, summary="Форма регистрации пользователя"
-)
-async def register(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
-
-
-@web_router.get("/login", response_class=HTMLResponse, summary="Вход")
-async def register(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
-
-
-@web_router.post(
-    "/register", response_class=HTMLResponse, summary="Страница успешной регистрации"
-)
-async def register_web(
-    request: Request,
-    session: SessionDep,
-    user: UserDep,
-):
-    try:
-        result = await register_user(user, session)
-        if result:
-            return templates.TemplateResponse("avatar.html", {"request": request})
-
-    except HTTPException as e:
-
-        if e.detail == "User with this username or email already exists":
-            message = "Пользователь с таким именем или почтой уже существует"
-        else:
-            message = "Ошибка регистрации пользователя"
-
-    except Exception as e:
-        message = f"Ошибка {e}"
-
-    return templates.TemplateResponse(
-        "submit.html", {"request": request, "message": message}
-    )
+@router.post("/logout")
+async def logout():
+    response = RedirectResponse(url="/", status_code=303)
+    response.delete_cookie(key="access_token")
+    print(response)
+    return response

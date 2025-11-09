@@ -168,8 +168,9 @@ async def edit_task(
         raise HTTPException(status_code=404, detail="Task not found")
 
     update_data = task.model_dump(exclude_unset=True)
-    update_task = db_task.model_copy(update=update_data)
-    new_task = await save_and_refresh(session, update_task)
+    for k, v in update_data.items():
+        setattr(db_task, k, v)
+    new_task = await save_and_refresh(session, db_task)
 
     if new_task is None:
         raise HTTPException(status_code=404, detail="New Task not found")

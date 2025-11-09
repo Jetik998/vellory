@@ -10,13 +10,18 @@ from app.crud.users import db_get_user
 from app.models import User
 from app.schemas.auth import TokenData
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 FormDataDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 TokenDep = Annotated[str, Depends(oauth2_scheme)]
 
 
 async def get_current_user(token: TokenDep, session: SessionDep):
+    user = await verify_token(token, session)
+    return user
+
+
+async def verify_token(token, session: SessionDep):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
