@@ -1,43 +1,32 @@
 document.addEventListener('DOMContentLoaded', function () {
     const loginForm = document.getElementById('loginForm');
-    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
+    const usernameInput = document.getElementById('username');
     const logoutButton = document.getElementById('logoutButton');
-    const
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const authBtnAction = document.getElementById('auth-btn-action');
+    let mode = 'login';
 
-    // форма логина
-    if (loginForm && usernameInput && passwordInput) {
-        usernameInput.addEventListener('input', function () {
-            const value = usernameInput.value.trim();
-            if (value.includes('@')) {
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                usernameInput.setCustomValidity(
-                    emailPattern.test(value)
-                        ? ''
-                        : 'Введите корректный email (должна быть точка после @)'
-                );
-            } else {
-                usernameInput.setCustomValidity('');
-            }
-        });
-
+    // обработка формы входа
+    if (loginForm) {
         loginForm.addEventListener('submit', async function (event) {
             event.preventDefault();
-            if (!loginForm.checkValidity()) {
-                loginForm.reportValidity();
-                return;
-            }
+
             const requestBody = new URLSearchParams({
-                username: usernameInput.value,
+                email: emailInput.value,
                 password: passwordInput.value
             });
+
             try {
                 const response = await fetch('/api/auth/token-cookie', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: requestBody,
                     credentials: 'include'
                 });
+
                 if (response.ok) {
                     window.location.reload();
                 } else {
@@ -50,6 +39,35 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+        function updateUI() {
+            if (mode === 'register') {
+                usernameInput.style.display = 'block';
+                loginBtn.classList.add('auth-deactive-btn');
+                registerBtn.classList.remove('auth-deactive-btn');
+                authBtnAction.textContent = 'Регистрация';
+                document.querySelector('p').textContent = 'Создайте свой аккаунт';
+            } else {
+                usernameInput.style.display = 'none';
+                registerBtn.classList.add('auth-deactive-btn');
+                loginBtn.classList.remove('auth-deactive-btn');
+                authBtnAction.textContent = 'Войти';
+                document.querySelector('p').textContent = 'Войдите в свой аккаунт';
+            }
+        }
+
+        registerBtn.addEventListener('click', () => {
+            mode = 'register';
+            updateUI();
+        });
+
+        loginBtn.addEventListener('click', () => {
+            mode = 'login';
+            updateUI();
+        });
+
+        // инициализация
+        updateUI();
+
     // кнопка выхода
     if (logoutButton) {
         logoutButton.addEventListener('click', async function () {
@@ -58,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     method: 'POST',
                     credentials: 'include'
                 });
+
                 if (response.ok) {
                     window.location.reload();
                 } else {
@@ -69,5 +88,3 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
-
-

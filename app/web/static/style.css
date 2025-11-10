@@ -6,6 +6,8 @@
     --btn-bg: #0071E3;
     --txt-color-dark: #1D1D1F;
     --input-color: #262626;
+    --btn-bg-deactive: #262626;
+    --border-color: #3D3D3D;
 }
 
 
@@ -24,18 +26,24 @@ button {
     border-radius: 16px;
     cursor: pointer;
     font-size: 14px;
-    padding: 0.7em;
+    padding: 0.8em;
 }
 
-button:hover {
-    background-color: #0056b3;
+#auth-btn-action {
+    margin-top: 2.5em;
 }
+
+.auth-deactive-btn {
+    background: var(--btn-bg-deactive);
+
+}
+
 
 input {
     padding: 0.7em;
     margin-top: 1.5em;
     border-radius: 16px;
-    border: 1px solid #3D3D3D;
+    border: 1px solid var(--border-color);
     background: var(--input-color);
     color: white;
 
