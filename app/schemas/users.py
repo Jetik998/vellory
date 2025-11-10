@@ -10,7 +10,7 @@ class UserBase(BaseModel):
     email: EmailStr
 
 
-class UserIn(UserBase):
+class UserRegister(UserBase):
     password: str
 
 

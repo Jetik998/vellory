@@ -7,49 +7,74 @@ document.addEventListener('DOMContentLoaded', function () {
     const loginBtn = document.getElementById('loginBtn');
     const registerBtn = document.getElementById('registerBtn');
     const authBtnAction = document.getElementById('auth-btn-action');
+    const highLight = document.getElementById('highlight');
     let mode = 'login';
 
     // обработка формы входа
     if (loginForm) {
         loginForm.addEventListener('submit', async function (event) {
             event.preventDefault();
-
-            const requestBody = new URLSearchParams({
-                email: emailInput.value,
-                password: passwordInput.value
-            });
-
-            try {
-                const response = await fetch('/api/auth/token-cookie', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: requestBody,
-                    credentials: 'include'
+            if (mode === 'login') {
+                const requestBody = new URLSearchParams({
+                    email: emailInput.value,
+                    password: passwordInput.value
                 });
 
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    const errorData = await response.json();
-                    alert('Ошибка входа: ' + (errorData.detail || 'Неверные данные'));
+                try {
+                    const response = await fetch('/api/auth/token-cookie', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: requestBody,
+                        credentials: 'include'
+                    });
+
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        const errorData = await response.json();
+                        alert('Ошибка входа: ' + (errorData.detail || 'Неверные данные'));
+                    }
+                } catch {
+                    alert('Ошибка соединения с сервером');
                 }
-            } catch {
-                alert('Ошибка соединения с сервером');
+            } else {
+                const requestBody = {
+                    email: emailInput.value,
+                    username: usernameInput.value,
+                    password: passwordInput.value
+                };
+                try {
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody),
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        loginForm.reset();
+                        authBtnAction.textContent = 'Войти';
+                          setTimeout(() => {
+                            loginBtn.click();
+                          }, 1000);
+                    } else {
+                        const errorData = await response.json();
+                        alert('Ошибка регистрации: ' + (errorData.detail || 'Неверные данные'));
+                    }
+                } catch {
+                    alert('Ошибка соединения с сервером');
+                }
             }
         });
-    }
 
         function updateUI() {
             if (mode === 'register') {
                 usernameInput.style.display = 'block';
-                loginBtn.classList.add('auth-deactive-btn');
-                registerBtn.classList.remove('auth-deactive-btn');
+                highLight.style.left = '50%';
                 authBtnAction.textContent = 'Регистрация';
-                document.querySelector('p').textContent = 'Создайте свой аккаунт';
+                document.querySelector('p').textContent = 'Регистрация';
             } else {
                 usernameInput.style.display = 'none';
-                registerBtn.classList.add('auth-deactive-btn');
-                loginBtn.classList.remove('auth-deactive-btn');
+                highLight.style.left = '0';
                 authBtnAction.textContent = 'Войти';
                 document.querySelector('p').textContent = 'Войдите в свой аккаунт';
             }
@@ -87,4 +112,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-});
+}});

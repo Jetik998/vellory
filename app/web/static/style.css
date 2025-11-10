@@ -16,6 +16,7 @@ body {
     color: white;
     overflow: hidden;
     font-family: "Roboto", Arial, sans-serif;
+    z-index: -9;
 }
 
 /* ====== Элементы ====== */
@@ -29,14 +30,6 @@ button {
     padding: 0.8em;
 }
 
-#auth-btn-action {
-    margin-top: 2.5em;
-}
-
-.auth-deactive-btn {
-    background: var(--btn-bg-deactive);
-
-}
 
 
 input {

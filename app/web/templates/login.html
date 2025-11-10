@@ -15,6 +15,7 @@
             <div class="auth-btn-container">
                 <button type="button" id="loginBtn" class="auth-btn auth-btn-change">Войти</button>
                 <button type="button" id="registerBtn" class="auth-btn auth-btn-change auth-deactive-btn">Создать аккаунт</button>
+                <div id="highlight"></div>
             </div>
             <label for="email"></label>
             <input type="email" id="email" name="email" required placeholder="Email"
@@ -26,6 +27,8 @@
 
             <label for="password"></label>
             <input type="password" id="password" name="password" required placeholder="Пароль">
+
+            <p id="auth-p-success" class="auth-p">Успешная регистрация</p>
 
             <button id="auth-btn-action" type="submit" class="auth-btn">Войти</button>
 
