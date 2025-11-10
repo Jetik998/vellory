@@ -9,25 +9,24 @@
 </head>
 <body class="auth-page">
     <div id="auth-form">
-        <div id="in-auth-form">
-            <h2 class="auth-h2">Вход в Vellory</h2>
-            <form id="loginForm">
-                <label for="username"></label>
-                <input
-                type="text"
-                id="username"
-                name="username"
-                required
-                placeholder="Имя пользователя или Email"
-                >
-                <label for="password"></label>
-                <input type="password" id="password" name="password" required placeholder="Пароль">
-                <div class="auth-btn-container">
-                    <button type="submit" class="auth-btn">Войти</button>
-                    <button type="submit" class="auth-btn">Создать аккаунт</button>
-                </div>
-            </form>
-        </div>
+        <h2 class="auth-h2">Vellory</h2>
+        <p class="auth-p">Войдите в свой аккаунт</p>
+        <form id="loginForm">
+            <label for="username"></label>
+            <input
+            type="text"
+            id="username"
+            name="username"
+            required
+            placeholder="Email"
+            >
+            <label for="password"></label>
+            <input type="password" id="password" name="password" required placeholder="Пароль">
+            <div class="auth-btn-container">
+                <button type="submit" class="auth-btn">Войти</button>
+                <button type="submit" class="auth-btn">Создать аккаунт</button>
+            </div>
+        </form>
     </div>
 <!--<script src="../static/auth.js"></script>-->
 <script src="../static/cookie_auth.js"></script>

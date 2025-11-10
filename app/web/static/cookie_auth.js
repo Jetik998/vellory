@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
     const logoutButton = document.getElementById('logoutButton');
+    const
 
     // форма логина
     if (loginForm && usernameInput && passwordInput) {
@@ -68,3 +69,5 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+

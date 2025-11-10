@@ -4,43 +4,37 @@ body.auth-page {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
 }
 
 /* ====== form ====== */
 #auth-form {
     background: var(--form-bg);
-    width: 50vh;
-    min-width: 20%;
-    height: auto;
-    margin: auto;
-    box-shadow: 0 0 50px #00000050;
-    border-radius: 15px;
-    /*border: 5px solid red;*/
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#in-auth-form {
-    margin-top: 1em;
-    width: 90%;
-    /*border: 5px solid white;*/
+    border-radius: 30px;
+    border: 1px solid #6A6A6A;
+    padding: 2em 1em;
+    width: 35vh;
 }
 
 
-/* ====== h2 ====== */
+/* ====== Заголовок ====== */
 .auth-h2 {
     text-align: center;
+    font-size: 20px;
+    margin: 0;
 }
 
-/* ====== btn ====== */
-.auth-btn {
-    margin: 0.7em 0;
+.auth-p {
+    text-align: center;
+    font-size: 14px;
+    color: #FFFFFF59;
+    margin-bottom: 0.5em;
 }
 
+/* ====== Элементы ====== */
 .auth-btn-container {
-    margin-top: 1rem;
+    margin-top: 1.5em;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1em;
 }
