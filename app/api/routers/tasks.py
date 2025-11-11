@@ -63,7 +63,7 @@ async def create_task(
     summary="Этот эндпоинт устарел",
     deprecated=True,  # <--- пометка, что эндпоинт устарел
 )
-async def create_task():
+async def deprecated_create_task():
     return {"message": "Этот эндпоинт устарел, используйте новый "}
 
 
@@ -143,7 +143,7 @@ async def delete_task(task_id: int, session: SessionDep, user: CurrentUserDep):
     response_model=TaskResponse,
     deprecated=True,
 )
-async def edit_task(
+async def edit_task_old(
     task: EditTask, task_id: int, session: SessionDep, user: CurrentUserDep
 ):
     db_task = await db_get_task(session, task_id, user.id)

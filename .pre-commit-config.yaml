@@ -1,14 +1,33 @@
 repos:
 - repo: https://github.com/psf/black
-  rev: 25.9.0
+  rev: 25.11.0
   hooks:
     - id: black
       exclude: |
         ^experiments/|
 
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.13.2
+  rev: v0.14.4
   hooks:
     - id: ruff
       exclude: |
         ^experiments/|
+
+
+- repo: local
+  hooks:
+    - id: prettier
+      name: prettier
+      entry: prettier --write
+      language: node
+      types_or: [javascript, jsx, ts, tsx, json, css, html, markdown]
+      additional_dependencies:
+        - prettier@3.2.5
+
+
+-   repo: https://github.com/pre-commit/mirrors-eslint
+    rev: 'v9.39.1'  # Use the sha / tag you want to point at
+    hooks:
+    -   id: eslint
+        files: \.[jt]sx?$  # *.js, *.jsx, *.ts and *.tsx
+        types: [file]

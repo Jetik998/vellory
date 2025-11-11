@@ -1,4 +1,4 @@
-from fastapi import HTTPException, UploadFile
+from fastapi import UploadFile
 from sqlalchemy import select, exists
 
 from app.core.avatars import save_avatar_file
