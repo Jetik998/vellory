@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const registerBtn = document.getElementById("registerBtn");
   const authBtnAction = document.getElementById("auth-btn-action");
   const highLight = document.getElementById("highlight");
-  const originalColor = authBtnAction.style.backgroundColor;
   let mode = "login";
 
   // Обработка формы входа и регистрации
@@ -58,6 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
           });
           // Успешная регистрация → сброс формы и переключение в режим входа
           if (response.ok) {
+            const originalColor = authBtnAction.style.backgroundColor;
             loginForm.reset();
             authBtnAction.style.backgroundColor = "green";
             authBtnAction.textContent = "Успешная Регистрация";
@@ -66,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
               loginBtn.click();
             }, 1500);
           } else if (response.status === 409) {
+            const originalColor = authBtnAction.style.backgroundColor;
             const text = authBtnAction.textContent;
             authBtnAction.style.backgroundColor = "red";
             authBtnAction.textContent = "Имя или email уже занято";
