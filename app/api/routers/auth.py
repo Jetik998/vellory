@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Response
+from fastapi import APIRouter, HTTPException, status
 from app.enums import Tags
 
 from app.security.auth import authenticate_user
@@ -20,7 +20,7 @@ async def register(user: UserRegister, session: SessionDep) -> UserRegisterRespo
     return await register_user(user, session)
 
 
-async def login(user_data: Login, session: SessionDep) -> str:
+async def login(user_data: Login, session) -> str:
     user = await authenticate_user(str(user_data.email), user_data.password, session)
     if not user:
         raise HTTPException(
@@ -37,22 +37,4 @@ async def login(user_data: Login, session: SessionDep) -> str:
 )
 async def token(form_data: FormDataDep, session: SessionDep) -> TokenResponse:
     access_token = await login(form_data, session)
-    return TokenResponse(access_token=access_token, token_type="bearer")
-
-
-@router.post(
-    "/token-cookie",
-    summary="Вход в систему и выдача куки с токеном",
-    response_model=TokenResponse,
-)
-async def token_cookie(user_data: Login, session: SessionDep, response: Response):
-    access_token = await login(user_data, session)
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=False,
-        samesite="lax",
-        max_age=3600,
-    )
     return TokenResponse(access_token=access_token, token_type="bearer")

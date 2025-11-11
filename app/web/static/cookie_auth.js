@@ -10,21 +10,23 @@ document.addEventListener("DOMContentLoaded", function () {
   const highLight = document.getElementById("highlight");
   let mode = "login";
 
-  // обработка формы входа
+  // Обработка формы входа и регистрации
   if (loginForm) {
     loginForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       if (mode === "login") {
-        const requestBody = new URLSearchParams({
+        const requestBody = {
           email: emailInput.value,
           password: passwordInput.value,
-        });
-
+        };
+        // === ВХОД ===
         try {
-          const response = await fetch("/api/auth/token-cookie", {
+          const response = await fetch("/token-cookie", {
             method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: requestBody,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestBody),
             credentials: "include",
           });
 
@@ -37,12 +39,15 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch {
           alert("Ошибка соединения с сервером");
         }
+        // === РЕГИСТРАЦИЯ ===
       } else {
         const requestBody = {
           email: emailInput.value,
           username: usernameInput.value,
           password: passwordInput.value,
         };
+
+        // Отправка запроса на регистрацию
         try {
           const response = await fetch("/api/auth/register", {
             method: "POST",
@@ -50,10 +55,14 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(requestBody),
             credentials: "include",
           });
+          // Успешная регистрация → сброс формы и переключение в режим входа
           if (response.ok) {
+            const originalColor = authBtnAction.style.backgroundColor;
             loginForm.reset();
-            authBtnAction.textContent = "Войти";
+            authBtnAction.style.backgroundColor = "green";
+            authBtnAction.textContent = "Успешная Регистрация";
             setTimeout(() => {
+              authBtnAction.style.backgroundColor = originalColor;
               loginBtn.click();
             }, 1000);
           } else {
@@ -67,21 +76,23 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
     });
-
+    // === ИНТЕРФЕЙС СМЕНЫ РЕЖИМА РЕГИСТРАЦИЯ/ЛОГИН  ===
     function updateUI() {
       if (mode === "register") {
         usernameInput.style.display = "block";
         highLight.style.left = "50%";
+        usernameInput.required = true;
         authBtnAction.textContent = "Регистрация";
         document.querySelector("p").textContent = "Регистрация";
       } else {
         usernameInput.style.display = "none";
+        usernameInput.required = false;
         highLight.style.left = "0";
         authBtnAction.textContent = "Войти";
         document.querySelector("p").textContent = "Войдите в свой аккаунт";
       }
     }
-
+    // === ПЕРЕКЛЮЧЕНИЕ РЕЖИМА РЕГИСТРАЦИЯ/ЛОГИН ===
     registerBtn.addEventListener("click", () => {
       mode = "register";
       updateUI();
@@ -92,27 +103,27 @@ document.addEventListener("DOMContentLoaded", function () {
       updateUI();
     });
 
-    // инициализация
+    // === ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ===
     updateUI();
-
-    // кнопка выхода
-    if (logoutButton) {
-      logoutButton.addEventListener("click", async function () {
-        try {
-          const response = await fetch("/logout", {
-            method: "POST",
-            credentials: "include",
-          });
-
-          if (response.ok) {
-            window.location.reload();
-          } else {
-            alert("Ошибка при выходе");
-          }
-        } catch (error) {
-          console.error("Ошибка выхода:", error);
+  }
+  // === ОБРАБОТКА ВЫХОДА ===
+  if (logoutButton) {
+    logoutButton.addEventListener("click", async function () {
+      console.log("Кнопка выхода нажата"); // проверка
+      try {
+        const response = await fetch("/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+        // Успешный выход → обновление страницы
+        if (response.ok) {
+          window.location.reload();
+        } else {
+          alert("Ошибка при выходе");
         }
-      });
-    }
+      } catch (error) {
+        console.error("Ошибка выхода:", error);
+      }
+    });
   }
 });

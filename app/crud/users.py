@@ -8,14 +8,14 @@ from app.security.password import get_password_hash
 from app.schemas.users import UserRegister, UserInDB
 
 
-# Получить пользователя из базы данных, по username
+# Получить пользователя из базы данных, по username или email
 async def db_get_user(session, username: str = None, email: str = None):
     if username:
         stmt = select(User).where(User.username == username)
     elif email:
         stmt = select(User).where(User.email == email)
     else:
-        stmt = None
+        return None
     result = await session.execute(stmt)
     db_user = result.scalar_one_or_none()
     return db_user

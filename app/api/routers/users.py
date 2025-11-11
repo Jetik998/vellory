@@ -20,7 +20,7 @@ async def upload_avatar(
     file: UploadFile = File(...),
 ) -> AvatarUpdateResponse:
     base_url = str(request.base_url).rstrip("/")
-    db_user = await db_get_user(user.username, session)
+    db_user = await db_get_user(session, username=user.username)
     updated_user = await db_update_user_avatar(file, db_user, session)
     return AvatarUpdateResponse(
         message="Avatar updated", avatar_url=f"{base_url}/avatars/{updated_user.avatar}"

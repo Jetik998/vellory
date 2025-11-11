@@ -61,13 +61,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const logoutButton = document.getElementById("logoutButton");
   if (logoutButton) {
     logoutButton.addEventListener("click", async function () {
+      console.log("Кнопка выхода нажата");
       try {
-        const response = await fetch("/api/auth/logout", {
+        const response = await fetch("/logout", {
           method: "POST",
           credentials: "include",
         });
         if (response.ok) {
-          localStorage.removeItem("access_token");
+          // localStorage.removeItem("access_token");
           window.location.href = "/";
         } else {
           alert("Ошибка при выходе");

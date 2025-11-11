@@ -35,7 +35,7 @@ async def verify_token(token, session: SessionDep):
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    user = await db_get_user(token_data.username, session)
+    user = await db_get_user(session, username=token_data.username)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
