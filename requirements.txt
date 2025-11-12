@@ -1,3 +1,4 @@
+fastcrud
 aiofiles==25.1.0
 aiosqlite==0.21.0
 annotated-doc==0.0.3

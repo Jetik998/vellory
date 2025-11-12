@@ -10,6 +10,7 @@ repos:
   rev: v0.14.4
   hooks:
     - id: ruff
+      args: [--fix]
       exclude: |
         ^experiments/|
 

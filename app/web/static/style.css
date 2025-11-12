@@ -3,6 +3,7 @@
 :root {
   --main-bg: #0f0f0f;
   --form-bg: #1d1d1d;
+  --blocks: #1d1d1d;
   --btn-bg: #0071e3;
   --txt-color-dark: #1d1d1f;
   --input-color: #262626;
@@ -13,9 +14,27 @@
 body {
   background-color: var(--main-bg);
   color: white;
-  overflow: hidden;
   font-family: "Roboto", Arial, sans-serif;
-  z-index: -9;
+}
+
+#main {
+  display: grid;
+  grid-template-columns: 20% 80%;
+  border-radius: 16px;
+  margin: 1em 2em;
+}
+
+.left,
+.right {
+  margin: 1rem;
+  height: 100vh;
+  border-radius: 16px;
+}
+
+.blocks {
+  background: var(--blocks);
+  border-radius: 16px;
+  box-sizing: border-box;
 }
 
 /* ====== Элементы ====== */
