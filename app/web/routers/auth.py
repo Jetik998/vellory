@@ -48,6 +48,18 @@ async def home(user: CurrentUserFromCookieAccess):
     return FileResponse(TEMPLATES / "index.html")
 
 
+@router.get(
+    "/login",
+    summary="Страница с формой",
+    description="",
+)
+async def form():
+    """
+    Возвращает страницу с формой.
+    """
+    return FileResponse(TEMPLATES / "login.html")
+
+
 @router.post(
     "/refresh",
     summary="Вход в систему",

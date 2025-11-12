@@ -87,11 +87,11 @@ def verify_token_cookie(token, expected_token_type):
 
 
 async def user_from_cookie_token_access(request: Request, session: SessionDep):
-    return await get_current_user_cookie(TokenType.ACCESS, session)
+    return await get_current_user_cookie(request, session, TokenType.REFRESH)
 
 
 async def user_from_cookie_token_refresh(request: Request, session: SessionDep):
-    return await get_current_user_cookie(TokenType.REFRESH, session)
+    return await get_current_user_cookie(request, session, TokenType.REFRESH)
 
 
 CurrentUserFromCookieAccess = Annotated[User, Depends(user_from_cookie_token_access)]
