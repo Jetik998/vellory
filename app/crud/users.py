@@ -1,6 +1,5 @@
 from fastapi import UploadFile
 from sqlalchemy import select, exists
-
 from app.core.avatars import save_avatar_file
 from app.core.utils import save_and_refresh
 from app.models import User

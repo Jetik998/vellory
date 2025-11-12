@@ -1,11 +1,17 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
 from starlette.responses import FileResponse, RedirectResponse, Response
 
-from app.api.dependencies import SessionDep, CurrentUserFromCookie
+from app.api.dependencies import (
+    SessionDep,
+    CurrentUserFromCookieAccess,
+    CurrentUserFromCookieRefresh,
+)
 from app.api.routers.auth import login
 from app.core.config import BASE_DIR
 from app.enums import Tags
 from app.schemas.auth import TokenResponse, Login
+from app.security.jwt import create_refresh_token, create_access_token
+from app.utils import db_obj_to_dict
 
 router = APIRouter(tags=[Tags.web])
 WEB_DIR = BASE_DIR / "app" / "web" / "templates"
@@ -17,7 +23,7 @@ TEMPLATES = BASE_DIR / WEB_DIR
     summary="Главная страница",
     description="Возвращает HTML-файл главной страницы, если пользователь авторизован с помощью access_token из cookie.",
 )
-async def home(user: CurrentUserFromCookie):
+async def home(user: CurrentUserFromCookieAccess):
     """
     Возвращает главную страницу приложения для авторизованного пользователя.
 
@@ -48,14 +54,10 @@ async def home(user: CurrentUserFromCookie):
     description="Проверяет учетные данные и устанавливает cookie с токеном доступа.",
     response_model=TokenResponse,
 )
-async def refresh(request: Request, session: SessionDep):
-    pass
-    # """
-    # Авторизует пользователя и сохраняет токен в cookie.
-    # """
-    # token = request.cookies.get("access_token")
-    # access_token = create_access_token(data={"sub": user.email})
-    # refresh_token = create_refresh_token(data={"sub": user.email})
+async def refresh(user: CurrentUserFromCookieRefresh):
+    user_data = db_obj_to_dict(user)
+    create_access_token(user_data)
+    create_refresh_token(user_data)
 
 
 @router.post(
