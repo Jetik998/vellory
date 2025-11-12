@@ -10,7 +10,7 @@ from app.api.routers.auth import login
 from app.core.config import BASE_DIR
 from app.enums import Tags
 from app.schemas.auth import TokenResponse, Login
-from app.security.jwt import create_refresh_token, create_access_token
+from app.security.jwt import create_refresh_token
 from app.utils import db_obj_to_dict
 
 router = APIRouter(tags=[Tags.web])
@@ -56,7 +56,6 @@ async def home(user: CurrentUserFromCookieAccess):
 )
 async def refresh(user: CurrentUserFromCookieRefresh):
     user_data = db_obj_to_dict(user)
-    create_access_token(user_data)
     create_refresh_token(user_data)
 
 
@@ -84,13 +83,26 @@ async def token_cookie(user_data: Login, session: SessionDep, response: Response
     """
     Авторизует пользователя и сохраняет токен в cookie.
     """
-    access_token = await login(user_data, session)
+    tokens = await login(user_data, session)
+
+    access_token = tokens["access_token"]
+    refresh_token = tokens["refresh_token"]
+
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
         secure=False,
         samesite="lax",
-        max_age=3600,
+        max_age=60 * 60,
     )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=60 * 60 * 2,  # 7 дней
+    )
+
     return TokenResponse(access_token=access_token, token_type="bearer")
