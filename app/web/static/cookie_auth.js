@@ -1,3 +1,11 @@
+async function getMainPage() {
+  const response = await fetch("/", {
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Request failed");
+  return response.json();
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const loginForm = document.getElementById("loginForm");
   const emailInput = document.getElementById("email");
@@ -21,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
         // === ВХОД ===
         try {
-          const response = await fetch("/token-cookie", {
+          const response = await fetch("/login", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
