@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
   const usernameInput = document.getElementById("username");
-  const logoutButton = document.getElementById("logoutButton");
   const loginBtn = document.getElementById("loginBtn");
   const registerBtn = document.getElementById("registerBtn");
   const authBtnAction = document.getElementById("auth-btn-action");
@@ -114,25 +113,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // === ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ===
     updateUI();
-  }
-  // === ОБРАБОТКА ВЫХОДА ===
-  if (logoutButton) {
-    logoutButton.addEventListener("click", async function () {
-      console.log("Кнопка выхода нажата"); // проверка
-      try {
-        const response = await fetch("/logout", {
-          method: "POST",
-          credentials: "include",
-        });
-        // Успешный выход → обновление страницы
-        if (response.ok) {
-          window.location.reload();
-        } else {
-          alert("Ошибка при выходе");
-        }
-      } catch (error) {
-        console.error("Ошибка выхода:", error);
-      }
-    });
   }
 });
