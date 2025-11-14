@@ -4,12 +4,15 @@ from starlette.responses import FileResponse, RedirectResponse, Response
 from app.api.dependencies import (
     SessionDep,
     CurrentUserFromCookieAccess,
+    CurrentUserFromCookieRefresh,
+    CurrentUserFromCookieAccessLenient,
 )
-from app.api.routers.auth import login
+from app.api.routers.auth import create_tokens, get_email_for_authenticate_user
 from app.core.config import BASE_DIR
 from app.enums import Tags
 from app.schemas.auth import Login
-from app.schemas.users import UserResponse
+from app.schemas.users import UserEmail
+from app.security.jwt import set_tokens
 
 router = APIRouter(tags=[Tags.web])
 WEB_DIR = BASE_DIR / "app" / "web" / "templates"
@@ -17,45 +20,66 @@ TEMPLATES = BASE_DIR / WEB_DIR
 
 
 @router.get(
-    "/me",
-    response_model=UserResponse,
-    summary="Получение данных текущего пользователя",
-    description=(
-        "Возвращает информацию об авторизованном пользователе. "
-        "Требуется действительный токен доступа."
-    ),
-)
-async def me(
-    user: CurrentUserFromCookieAccess,
-):
-    return
-
-
-@router.get(
     "/",
-    summary="Страница с формой",
+    summary="Базовая страница",
     description="",
 )
-async def form(user: CurrentUserFromCookieAccess):
+async def root(user: CurrentUserFromCookieAccessLenient):
     """
     Возвращает страницу с формой.
     """
     if user:
         return FileResponse(TEMPLATES / "index.html")
 
+    return RedirectResponse("/login", status_code=303)
+
+
+@router.get(
+    "/login",
+    summary="Базовая страница",
+    description="",
+)
+async def login(user: CurrentUserFromCookieAccessLenient):
+    if user:
+        return RedirectResponse("/", status_code=303)
+
     return FileResponse(TEMPLATES / "login.html")
 
 
-#
-# @router.post(
-#     "/refresh",
-#     summary="Вход в систему",
-#     description="Проверяет учетные данные и устанавливает cookie с токеном доступа.",
-#     response_model=TokenResponse,
-# )
-# async def refresh(user: CurrentUserFromCookieRefresh):
-#     user_data = db_obj_to_dict(user)
-#     create_refresh_token(user_data)
+@router.get(
+    "/token",
+    summary="Проверка токена",
+    description="Проверяет access token",
+)
+async def verify_access_token(user: CurrentUserFromCookieAccess):
+    return user
+
+
+@router.get(
+    "/refresh",
+    summary="Вход в систему",
+    description="Проверяет учетные данные и устанавливает cookie с токеном доступа.",
+)
+async def verify_refresh_token(user: CurrentUserFromCookieRefresh, response: Response):
+    tokens = create_tokens(user.email)
+    set_tokens(response, tokens)
+    return {"status": "ok"}
+
+
+@router.post(
+    "/authorize",
+    summary="Вход в систему",
+    description="Проверяет учетные данные и устанавливает cookie с токеном доступа.",
+)
+async def token_cookie(user_data: Login, session: SessionDep):
+    """
+    Авторизует пользователя и сохраняет токен в cookie.
+    """
+    email: UserEmail = await get_email_for_authenticate_user(user_data, session)
+    tokens = create_tokens(email)
+    response = RedirectResponse("/", status_code=303)
+    set_tokens(response, tokens)
+    return response
 
 
 @router.post(
@@ -71,42 +95,31 @@ async def logout():
     response.delete_cookie(key="access_token")
     return response
 
-
-@router.post(
-    "/login",
-    summary="Вход в систему",
-    description="Проверяет учетные данные и устанавливает cookie с токеном доступа.",
-)
-async def token_cookie(user_data: Login, session: SessionDep, response: Response):
-    """
-    Авторизует пользователя и сохраняет токен в cookie.
-    """
-    tokens = await login(user_data, session)
-
-    access_token = tokens["access_token"]
-    refresh_token = tokens["refresh_token"]
-
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=False,
-        samesite="lax",
-        max_age=60 * 60,
-    )
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=False,
-        samesite="lax",
-        max_age=60 * 60 * 2,  # 7 дней
-    )
-
-    return {
-        "access_token": "created",
-        "refresh_token": "created",
-    }
+    #
+    # access_token = tokens["access_token"]
+    # refresh_token = tokens["refresh_token"]
+    #
+    # response.set_cookie(
+    #     key="access_token",
+    #     value=access_token,
+    #     httponly=True,
+    #     secure=False,
+    #     samesite="lax",
+    #     max_age=60 * 60,
+    # )
+    # response.set_cookie(
+    #     key="refresh_token",
+    #     value=refresh_token,
+    #     httponly=True,
+    #     secure=False,
+    #     samesite="lax",
+    #     max_age=60 * 60 * 2,  # 7 дней
+    # )
+    #
+    # return {
+    #     "access_token": "created",
+    #     "refresh_token": "created",
+    # }
 
 
 # @router.get(

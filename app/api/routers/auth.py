@@ -4,10 +4,10 @@ from fastcrud.exceptions.http_exceptions import UnauthorizedException
 from app.enums import Tags
 
 from app.security.auth import authenticate_user
-from app.schemas.users import UserRegister, UserRegisterResponse
+from app.schemas.users import UserRegister, UserRegisterResponse, UserEmail
 from app.schemas.auth import TokenResponse, Login
 from app.api.dependencies import SessionDep, FormDataDep
-from app.security.jwt import create_access_token, create_refresh_token
+from app.security.jwt import create_tokens
 from app.services.users import register_user
 
 router = APIRouter(prefix="/api/auth", tags=[Tags.auth])
@@ -22,15 +22,19 @@ async def register(user: UserRegister, session: SessionDep) -> UserRegisterRespo
     return await register_user(user, session)
 
 
+async def get_email_for_authenticate_user(user_data: Login, session) -> UserEmail:
+    user = await authenticate_user(str(user_data.email), user_data.password, session)
+    if not user:
+        raise UnauthorizedException("Incorrect username or password")
+    return user.email
+
+
 async def login(user_data: Login, session) -> dict[str, str]:
     user = await authenticate_user(str(user_data.email), user_data.password, session)
     if not user:
         raise UnauthorizedException("Incorrect username or password")
 
-    tokens = {
-        "access_token": create_access_token(data={"sub": user.email}),
-        "refresh_token": create_refresh_token(data={"sub": user.email}),
-    }
+    tokens = create_tokens(user.email)
     return tokens
 
 

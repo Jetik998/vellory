@@ -21,6 +21,6 @@ async def authenticate_user(email: str, password: str, session):
         Объект пользователя, если аутентификация успешна, иначе None.
     """
     user = await db_get_user(session, email=email)
-    if not user and not verify_password(password, user.hashed_password):
+    if not user or not verify_password(password, user.hashed_password):
         return None
     return user

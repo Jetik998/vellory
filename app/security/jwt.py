@@ -4,6 +4,7 @@ from typing import Any
 import jwt
 from app.core.config import SECRET_KEY, ALGORITHM
 from app.enums.tokens import TokenType
+from app.schemas.users import UserEmail
 
 
 def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None):
@@ -11,7 +12,7 @@ def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = 
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(seconds=3)
+        expire = datetime.now(timezone.utc) + timedelta(seconds=5)
     to_encode.update({"exp": expire, "token_type": TokenType.ACCESS})
     encoded_jwt: str = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -24,7 +25,41 @@ def create_refresh_token(
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(seconds=10)
+        expire = datetime.now(timezone.utc) + timedelta(hours=1)
     to_encode.update({"exp": expire, "token_type": TokenType.REFRESH})
     encoded_jwt: str = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
+def create_tokens(email: UserEmail) -> dict[str, str]:
+    tokens = {
+        "access_token": create_access_token(data={"sub": email}),
+        "refresh_token": create_refresh_token(data={"sub": email}),
+    }
+    return tokens
+
+
+def set_tokens(response, tokens) -> dict[str, str]:
+    access_token = tokens["access_token"]
+    refresh_token = tokens["refresh_token"]
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=6,
+    )
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=60 * 59,  # 7 дней
+    )
+
+    return {
+        "access_token": "created",
+        "refresh_token": "created",
+    }
