@@ -25,3 +25,4 @@ app.include_router(web_router)
 
 app.mount("/avatars", StaticFiles(directory=AVATAR_DIR), name="avatars")
 app.mount("/static", StaticFiles(directory="app/web/static"), name="static")
+app.mount("/img", StaticFiles(directory="app/media/img"), name="img")
