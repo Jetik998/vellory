@@ -4,8 +4,8 @@ from starlette.responses import FileResponse, RedirectResponse, Response
 from app.api.dependencies import (
     SessionDep,
     CurrentUserFromCookieAccess,
-    CurrentUserFromCookieRefresh,
     CurrentUserFromCookieAccessLenient,
+    CurrentUserFromCookieRefreshLenient,
 )
 from app.api.routers.auth import create_tokens, get_email_for_authenticate_user
 from app.core.config import BASE_DIR
@@ -17,6 +17,12 @@ from app.security.jwt import set_tokens
 router = APIRouter(tags=[Tags.web])
 WEB_DIR = BASE_DIR / "app" / "web" / "templates"
 TEMPLATES = BASE_DIR / WEB_DIR
+ICON_DIR = BASE_DIR / "app" / "media" / "img"
+
+
+@router.get("/favicon.ico")
+async def favicon():
+    return FileResponse(ICON_DIR / "vellory.svg")
 
 
 @router.get(
@@ -31,7 +37,7 @@ async def root(user: CurrentUserFromCookieAccessLenient):
     if user:
         return FileResponse(TEMPLATES / "index.html")
 
-    return RedirectResponse("/login", status_code=303)
+    return RedirectResponse("/refresh", status_code=303)
 
 
 @router.get(
@@ -60,10 +66,16 @@ async def verify_access_token(user: CurrentUserFromCookieAccess):
     summary="Вход в систему",
     description="Проверяет учетные данные и устанавливает cookie с токеном доступа.",
 )
-async def verify_refresh_token(user: CurrentUserFromCookieRefresh, response: Response):
-    tokens = create_tokens(user.email)
-    set_tokens(response, tokens)
-    return {"status": "ok"}
+async def verify_refresh_token(
+    user: CurrentUserFromCookieRefreshLenient, response: Response
+):
+    if user:
+        tokens = create_tokens(user.email)
+        response = RedirectResponse("/", status_code=303)
+        set_tokens(response, tokens)
+        return response
+
+    return RedirectResponse("/login", status_code=303)
 
 
 @router.post(
