@@ -1,5 +1,5 @@
 from sqlalchemy import select, exists
-from app.core.avatars import update_avatar_file
+from app.core.avatars import update_avatar_file, delete_avatar_file
 from app.core.utils import save_and_refresh
 from app.models import User
 from app.security.password import get_password_hash
@@ -40,6 +40,25 @@ async def db_add_user(user: UserRegister, session):
 
 
 async def db_update_user_avatar(file, user, session):
-    user.avatar = await update_avatar_file(user.username, file)
+    """
+    Обновляет аватар пользователя.
+
+    Выполняет проверку файла, сохраняет изображение с безопасным именем,
+    присваивает пользователю путь к новому файлу и фиксирует изменения в БД.
+
+    Args:
+        file: Загруженный файл (UploadFile).
+        user: Пользователь, чей аватар обновляется.
+        session: Сессия базы данных.
+
+    Returns:
+        Пользователь с обновлённым путём к аватару.
+    """
+    new_avatar = await update_avatar_file(file)
+    if new_avatar:
+        await delete_avatar_file(user.avatar)
+        user.avatar = new_avatar
+    else:
+        return None
     await save_and_refresh(session, user)
     return user

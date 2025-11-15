@@ -5,6 +5,7 @@ from fastcrud.exceptions.http_exceptions import NotFoundException, UnauthorizedE
 from jwt import InvalidTokenError, ExpiredSignatureError
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
+
 from app.core.config import SECRET_KEY, ALGORITHM
 from app.core.database import get_session
 from app.crud.users import db_get_user
@@ -70,6 +71,9 @@ async def get_current_user_cookie(
         if lenient:
             return None
         raise NotFoundException("User not found.")
+
+    if user.avatar:
+        user.avatar = f"avatars/{user.avatar}"
 
     return user
 

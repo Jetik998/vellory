@@ -19,6 +19,12 @@ class UserResponse(Base):
     email: EmailStr
 
 
+class UserResponseWeb(Base):
+    username: str
+    email: EmailStr
+    avatar: str | None = None
+
+
 class UserRegister(UserBase):
     password: str
 
@@ -39,7 +45,3 @@ class AvatarUpdateResponse(BaseModel):
 
 class AvatarUpdateResponseWeb(BaseModel):
     message: str
-
-
-class UserResponseWeb(Base, UserBase):
-    pass

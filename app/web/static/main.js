@@ -1,19 +1,19 @@
-async function updateAvatar(imgElement) {
+// Получить пользователя
+async function getUser() {
   try {
-    const response = await fetch("users/avatar/get?ts=" + Date.now(), {
-      cache: "no-store",
-      credentials: "include",
-    });
-    if (!response.ok) return;
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-
-    if (imgElement.src !== url) {
-      imgElement.src = url;
-    }
+    const response = await fetch("/users/me");
+    if (!response.ok) return null;
+    return await response.json();
   } catch {
-    // ошибки проглатываются намеренно
+    return null;
+  }
+}
+async function updateAvatar(imgElement) {
+  const user = await getUser();
+  if (!user || !user.avatar) return;
+
+  if (imgElement.src !== user.avatar) {
+    imgElement.src = user.avatar;
   }
 }
 
@@ -79,3 +79,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
+
+// async function updateAvatar(imgElement) {
+//   try {
+//     const response = await fetch("users/avatar/get");
+//     if (!response.ok) return;
+//
+//     const blob = await response.blob();
+//     const url = URL.createObjectURL(blob);
+//
+//     if (imgElement.src !== url) {
+//       imgElement.src = url;
+//     }
+//   } catch {
+//     // ошибки проглатываются намеренно
+//   }
+// }
