@@ -1,6 +1,9 @@
 async function updateAvatar(imgElement) {
   try {
-    const response = await fetch("users/avatar/get");
+    const response = await fetch("users/avatar/get?ts=" + Date.now(), {
+      cache: "no-store",
+      credentials: "include",
+    });
     if (!response.ok) return;
 
     const blob = await response.blob();
@@ -29,14 +32,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Предпросмотр
+    // Предпросмотр аватара
     const reader = new FileReader();
     reader.onload = (evt) => {
       userAvatar.src = evt.target.result;
     };
     reader.readAsDataURL(file);
 
-    // Подготовка отправки
+    // Подготовка отправки аватара
     const formData = new FormData();
     formData.append("file", file); // имя должно совпадать с параметром `file: UploadFile = File(...)`
 

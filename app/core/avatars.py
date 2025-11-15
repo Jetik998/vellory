@@ -44,6 +44,8 @@ async def get_avatar_file(username) -> tuple[Path, str]:
         media_type = "image/jpeg"
     elif ext == ".png":
         media_type = "image/png"
+    elif ext == ".svg":
+        media_type = "image/svg+xml"
     else:
         media_type = "application/octet-stream"
 
