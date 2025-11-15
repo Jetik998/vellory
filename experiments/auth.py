@@ -41,3 +41,59 @@
 #
 # GetAccessToken = Annotated[str | None, Depends(get_valid_access_token)]
 # response_tokens
+
+    #
+    # access_token = tokens["access_token"]
+    # refresh_token = tokens["refresh_token"]
+    #
+    # response.set_cookie(
+    #     key="access_token",
+    #     value=access_token,
+    #     httponly=True,
+    #     secure=False,
+    #     samesite="lax",
+    #     max_age=60 * 60,
+    # )
+    # response.set_cookie(
+    #     key="refresh_token",
+    #     value=refresh_token,
+    #     httponly=True,
+    #     secure=False,
+    #     samesite="lax",
+    #     max_age=60 * 60 * 2,  # 7 дней
+    # )
+    #
+    # return {
+    #     "access_token": "created",
+    #     "refresh_token": "created",
+    # }
+
+
+# @router.get(
+#     "/",
+#     summary="Главная страница",
+#     description="Возвращает HTML-файл главной страницы, если пользователь авторизован с помощью access_token из cookie.",
+# )
+# async def home(user: CurrentUserFromCookieAccess):
+#     """
+#     Возвращает главную страницу приложения для авторизованного пользователя.
+#
+#     Параметры
+#     ----------
+#     user : CurrentUserFromCookie
+#         Объект пользователя, извлечённый из базы данных.
+#         Данные о пользователе получены из access_token, сохранённого в cookie.
+#
+#     Возвращает
+#     -------
+#     FileResponse
+#         HTML-файл главной страницы при успешной аутентификации.
+#
+#     Исключения
+#     ----------
+#     UnauthorizedException
+#         Если отсутствует или недействителен токен авторизации.
+#     NotFoundException
+#         Если пользователь, указанный в токене, не найден в базе данных.
+#     """
+#     return FileResponse(TEMPLATES / "index.html")

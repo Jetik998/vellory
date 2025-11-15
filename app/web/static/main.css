@@ -291,7 +291,7 @@ body {
 
 .content-wrap .info-boxes .info-box {
   background: var(--main-bg);
-  height: 160px;
+  height: 100px; /*160*/
   display: flex;
   align-items: center;
   justify-content: flex-start;

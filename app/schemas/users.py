@@ -14,6 +14,11 @@ class UserBase(UserEmail):
     email: EmailStr
 
 
+class UserResponse(Base):
+    username: str
+    email: EmailStr
+
+
 class UserRegister(UserBase):
     password: str
 
@@ -32,5 +37,9 @@ class AvatarUpdateResponse(BaseModel):
     avatar_url: str
 
 
-class UserResponse(Base, UserBase):
+class AvatarUpdateResponseWeb(BaseModel):
+    message: str
+
+
+class UserResponseWeb(Base, UserBase):
     pass
