@@ -72,9 +72,6 @@ async def get_current_user_cookie(
             return None
         raise NotFoundException("User not found.")
 
-    if user.avatar:
-        user.avatar = f"avatars/{user.avatar}"
-
     return user
 
 

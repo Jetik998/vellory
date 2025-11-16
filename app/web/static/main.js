@@ -8,12 +8,22 @@ async function getUser() {
     return null;
   }
 }
-async function updateAvatar(imgElement) {
+async function updateUserData(imgElement, usernameElement) {
   const user = await getUser();
-  if (!user || !user.avatar) return;
-
-  if (imgElement.src !== user.avatar) {
-    imgElement.src = user.avatar;
+  const defaultAvatarLink =
+    "https://images.icon-icons.com/1378/PNG/512/avatardefault_92824.png";
+  const baseAvatar = "https://www.colorhexa.com/0f0f0f.png";
+  if (user) {
+    usernameElement.textContent = user.username;
+    if (user.avatar && imgElement.src !== user.avatar) {
+      imgElement.src = user.avatar;
+    } else if (imgElement.src === baseAvatar) {
+      imgElement.src = defaultAvatarLink;
+    }
+  } else {
+    if (imgElement.src === baseAvatar) {
+      imgElement.src = defaultAvatarLink;
+    }
   }
 }
 
@@ -21,8 +31,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const logoutButton = document.getElementById("logoutButton");
   const userAvatar = document.getElementById("user-avatar-img");
   const fileInput = document.getElementById("fileInput");
+  const usernameCaption = document.getElementById("username-caption");
 
-  await updateAvatar(userAvatar);
+  await updateUserData(userAvatar, usernameCaption);
 
   userAvatar.addEventListener("click", () => {
     fileInput.click();

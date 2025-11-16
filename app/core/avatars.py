@@ -7,6 +7,7 @@ import aiofiles
 from app.core.config import BASE_DIR
 
 AVATAR_DIR = BASE_DIR / "app" / "media" / "avatars"
+MEDIA_DIR = BASE_DIR / "app" / "media"
 AVATAR_DIR.mkdir(exist_ok=True)
 
 
@@ -28,24 +29,24 @@ async def update_avatar_file(file) -> str:
     # Создаем имя файла + расширение и путь до нового файла например ~/2c1e7b98f20.jgp
     filename = secrets.token_hex(16) + ext
     path = AVATAR_DIR / filename
-
     # Открыть файл и записать данные
     async with aiofiles.open(path, "wb") as f:
         await f.write(content)
 
-    # Возвращает путь к файлу
-    return filename
+    # Возвращает имя папки и файла avatars/filename
+    return f"avatars/{filename}"
 
 
 async def delete_avatar_file(filename: str):
     if not filename:
         return
-    path = AVATAR_DIR / filename
-    if path.exists():
-        try:
-            await aiofiles.os.remove(path)
-        except Exception:
-            pass  # Не роняем приложение, если файл уже отсутствует
+    path = MEDIA_DIR / filename
+    print(f"path = {path}")
+    print(f"str(path) = {str(path)}")
+    try:
+        await aiofiles.os.remove(str(path))
+    except Exception:
+        pass  # Не роняем приложение, если файл уже отсутствует
 
 
 # Аватар берется из зависимости
