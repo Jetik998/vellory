@@ -8,11 +8,14 @@ async function getUser() {
     return null;
   }
 }
+
+// Обновляет имя пользователя и аватар, если аватар не загружен пользователем, устанавливает стандарный.
 async function updateUserData(imgElement, usernameElement) {
   const user = await getUser();
   const defaultAvatarLink =
     "https://images.icon-icons.com/1378/PNG/512/avatardefault_92824.png";
-  const baseAvatar = "https://www.colorhexa.com/0f0f0f.png";
+  const baseAvatar = window.location.origin + "/avatars/background-avatar.png";
+  console.log(imgElement.src);
   if (user) {
     usernameElement.textContent = user.username;
     if (user.avatar && imgElement.src !== user.avatar) {
