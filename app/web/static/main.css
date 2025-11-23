@@ -15,7 +15,7 @@
   --txt-color-dark: #1d1d1f;
   --input-color: #262626;
   --border-color: #3d3d3d;
-  --icons-color: white;
+  --icons-color: #7faae7;
   --hover: #0056b3;
   --checkbox-color: #262626;
   --stats-blocks-bg: #181818;
@@ -39,10 +39,7 @@ body {
   background: var(--main-bg);
   font-size: 16px;
   line-height: 120%;
-  font-family:
-    Open Sans,
-    Helvetica,
-    sans-serif;
+  font-family: "Open Sans", Helvetica, sans-serif;
 }
 
 .dashboard {
@@ -143,15 +140,12 @@ body {
 
 .menu-wrap .user {
   margin-top: 2em;
-  width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 0;
-  box-sizing: border-box;
 }
 
 .menu-wrap .user .user-avatar {
-  margin-top: 1em;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -167,24 +161,25 @@ body {
 
 .menu-wrap .user figcaption {
   margin-top: 1em;
-  padding: 0 0 0 1.5em;
   color: var(--text-color);
   font-weight: 700;
-  font-size: 1em;
+  font-size: 1rem;
   line-height: 100%;
 }
 
 .menu-wrap nav {
   display: block;
-  padding-left: 2em;
+  margin-top: 4em;
 }
 
 .menu-wrap nav section {
   display: block;
-  padding: 3em 0 0;
+  margin-left: 2em;
 }
 
+/*Скрыт*/
 .menu-wrap nav h3 {
+  display: none;
   padding-bottom: 1em;
   font-size: 0.875em;
   text-transform: uppercase;
@@ -195,15 +190,15 @@ body {
 
 .menu-wrap nav ul {
   display: block;
-  padding: 0;
   margin-top: 1em;
+  padding: 0;
 }
 
 .menu-wrap nav li {
   display: block;
   padding: 0;
   margin-top: 1em;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .menu-wrap nav li a {
@@ -293,7 +288,7 @@ body {
   background: #1d1d1d;
   border: 1px solid var(--border-color);
   border-radius: 10px;
-  display: flex;
+  display: none;
   flex-direction: column;
   max-width: 300px;
 }
@@ -303,7 +298,6 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-sizing: border-box;
 }
 
 .content-wrap .person-boxes .task-container .card-header input {
@@ -322,7 +316,6 @@ body {
   display: flex;
   align-items: center;
   gap: 5px;
-  box-sizing: border-box;
   margin-right: 1em;
 }
 
@@ -350,7 +343,6 @@ body {
   outline: none;
   resize: none;
   overflow: hidden;
-  box-sizing: border-box;
   border-radius: 10px;
   margin: 0.5em;
   background: #262626;

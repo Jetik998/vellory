@@ -36,38 +36,136 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fileInput = document.getElementById("fileInput");
   const usernameCaption = document.getElementById("username-caption");
   const changeAvatar = document.getElementById("ChangeAvatar");
-  const circles = document.querySelectorAll(".circle");
 
   await updateUserData(userAvatar, usernameCaption);
 
-  let taskPriority = 0;
+  // Класс задачи
+  class TaskCard {
+    constructor() {
+      // Находим шаблон карточки задачи на странице
+      const template = document.querySelector(".task-container");
 
-  circles.forEach((circle, index) => {
-    circle.addEventListener("click", () => {
-      // Проверяем, активен ли последний кликнутый круг
+      // Уникальный идентификатор задачи
+      this.id = getCurrentTaskId();
+      // Приоритет задачи по умолчанию 0 (не установлен)
+      this.taskPriority = 0;
+      // Клонируем шаблон карточки, чтобы создать новую
+      this.card = template.cloneNode(true);
+      // Присваиваем уникальный id элементу карточки
+      this.card.id = `task-${this.id}`;
+      // Делаем карточку видимой (по умолчанию, возможно, скрыта в шаблоне)
+      this.card.style.display = "flex";
+
+      // Устанавливаем номер задачи на карточке
+      this.setTaskNumber();
+      // Настраиваем кнопку сохранения
+      this.setupSaveButton();
+      // Настраиваем кнопку отмены
+      this.setupCancelButton();
+      // Настраиваем обработку кликов по кругам приоритетов
+      this.setupPriorityCircles();
+
+      // Добавляем новую карточку в контейнер на странице
+      document.querySelector(".person-boxes").appendChild(this.card);
+    }
+
+    // Метод для отображения номера задачи
+    setTaskNumber() {
+      const numberSpan = this.card.querySelector(".task-number");
+      if (numberSpan) numberSpan.textContent = `#${this.id}`;
+    }
+
+    // Метод для настройки кнопки "Сохранить"
+    setupSaveButton() {
+      this.card
+        .querySelector(".card-btn-save")
+        .addEventListener("click", () => this.save());
+    }
+    setupCancelButton() {
+      this.card
+        .querySelector(".card-btn-cancel")
+        .addEventListener("click", () => this.cancel());
+    }
+
+    // Метод для настройки кликов по кругам приоритетов
+    setupPriorityCircles() {
+      const circles = this.card.querySelectorAll(".circle");
+      circles.forEach((circle, index) => {
+        circle.addEventListener("click", () =>
+          this.togglePriority(circles, index),
+        );
+      });
+    }
+
+    // Метод для изменения приоритета задачи при клике на круг
+    togglePriority(circles, index) {
+      const circle = circles[index];
       const isActive = circle.classList.contains("active");
 
+      // Если круг не активен, активируем все до выбранного включительно
+      // Если уже активен, сбрасываем приоритет
       circles.forEach((c, i) => {
         if (!isActive && i <= index) {
-          c.classList.remove("active");
-          c.style.backgroundColor = c.dataset.color;
-          circle.classList.add("active");
+          c.classList.remove("active"); // На всякий случай сбрасываем класс
+          c.style.backgroundColor = c.dataset.color; // Устанавливаем цвет из data-атрибута
+          circle.classList.add("active"); // Активируем выбранный круг
         } else {
-          c.classList.remove("active");
-          c.style.backgroundColor = "transparent";
+          c.classList.remove("active"); // Деактивируем все остальные
+          c.style.backgroundColor = "transparent"; // Сброс цвета
         }
       });
-      taskPriority = isActive ? 0 : index + 1;
-    });
-  });
 
-  // Функция для сброса всех кружков в прозрачные
-  function resetCircles() {
-    circles.forEach((circle) => {
-      circle.style.backgroundColor = "transparent";
-    });
-    taskPriority = 0; // сброс приоритета
+      // Сохраняем текущий уровень приоритета
+      this.taskPriority = isActive ? 0 : index + 1;
+      console.log(`Task #${this.id} priority:`, this.taskPriority);
+    }
+
+    // Метод для "сохранения" задачи
+    save() {
+      // Делаем все поля ввода и textarea неактивными
+      this.card
+        .querySelectorAll("input, textarea")
+        .forEach((el) => (el.disabled = true));
+      // Делаем круги приоритетов некликабельными
+      this.card
+        .querySelectorAll(".circle")
+        .forEach((el) => (el.style.pointerEvents = "none"));
+      // Деактивируем кнопку сохранения
+      this.card
+        .querySelectorAll(".card-btn")
+        .forEach((btn) => (btn.style.display = "none"));
+      // Увеличить счетчик
+      incrementTaskId();
+    }
+
+    cancel() {
+      // Удаляем карточку из DOM
+      if (this.card && this.card.parentNode) {
+        this.card.parentNode.removeChild(this.card);
+      }
+
+      // Очищаем ссылки (необязательно, но полезно для сборщика мусора)
+      this.card = null;
+    }
   }
+
+  let taskCounter = 1;
+
+  // Функция возвращает текущий последний ID без изменения счётчика
+  function getCurrentTaskId() {
+    return taskCounter;
+  }
+
+  // Функция увеличивает счётчик и возвращает новый ID
+  function incrementTaskId() {
+    return taskCounter++;
+  }
+
+  const createTaskBtn = document.getElementById("create-task");
+  // Обработчик кнопки создания задач
+  createTaskBtn.addEventListener("click", () => {
+    new TaskCard();
+  });
 
   // При клике на элемент userAvatar программно «кликается» по fileInput.
   userAvatar.addEventListener("click", () => {

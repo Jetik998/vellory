@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vellory</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../static/main.css" />
     <script src="../static/main.js"></script>
   </head>
@@ -151,7 +155,7 @@
 
             <ul>
               <li>
-                <a href="#">
+                <a href="#" id="create-task">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -205,48 +209,21 @@
         </nav>
       </header>
       <main class="content-wrap">
-        <div class="content-head">
-          <div class="stats-container">
-            <div class="stats-content">
-              <span class="stats-text">Все</span>
-              <span class="stats-num">0</span>
-            </div>
-            <div class="stats-content">
-              <span class="stats-text">Критично</span>
-              <span class="stats-num">0</span>
-            </div>
-            <div class="stats-content">
-              <span class="stats-text">Важно</span>
-              <span class="stats-num">0</span>
-            </div>
-            <div class="stats-content">
-              <span class="stats-text">Нормально</span>
-              <span class="stats-num">0</span>
-            </div>
-            <div class="stats-content">
-              <span class="stats-text">Не важно</span>
-              <span class="stats-num">0</span>
-            </div>
-            <div class="stats-content">
-              <span class="stats-text">Выполнено</span>
-              <span class="stats-num">0</span>
-            </div>
-          </div>
-        </div>
         <div class="content">
           <section class="person-boxes">
             <div class="task-container">
+              <span class="task-number">#0</span>
               <div class="card-header">
                 <input
                   type="text"
                   placeholder="Название задачи"
-                  id="card-title-input"
+                  class="card-title-input"
                   maxlength="25"
                 />
                 <div class="card-circles">
-                  <div id="circle1" class="circle" data-color="#59c956"></div>
-                  <div id="circle2" class="circle" data-color="#f9bf4e"></div>
-                  <div id="circle3" class="circle" data-color="#f46e5f"></div>
+                  <div class="circle" data-color="#59c956"></div>
+                  <div class="circle" data-color="#f9bf4e"></div>
+                  <div class="circle" data-color="#f46e5f"></div>
                 </div>
               </div>
 
@@ -254,14 +231,18 @@
                 <div class="card-content-text">
                   <textarea
                     placeholder="Описание задачи"
-                    id="card-content-input"
+                    class="card-content-input"
                     rows="3"
-                    maxlength="100"
+                    maxlength="90"
                   ></textarea>
                 </div>
                 <div class="card-content-footer">
-                  <button class="card-btn">Сохранить</button>
-                  <button class="card-btn">Отменить</button>
+                  <button type="button" class="card-btn card-btn-save">
+                    Сохранить
+                  </button>
+                  <button type="button" class="card-btn card-btn-cancel">
+                    Отменить
+                  </button>
                 </div>
               </div>
             </div>
@@ -271,3 +252,32 @@
     </div>
   </body>
 </html>
+
+<!--        <div class="content-head">-->
+<!--          <div class="stats-container">-->
+<!--            <div class="stats-content">-->
+<!--              <span class="stats-text">Все</span>-->
+<!--              <span class="stats-num">0</span>-->
+<!--            </div>-->
+<!--            <div class="stats-content">-->
+<!--              <span class="stats-text">Критично</span>-->
+<!--              <span class="stats-num">0</span>-->
+<!--            </div>-->
+<!--            <div class="stats-content">-->
+<!--              <span class="stats-text">Важно</span>-->
+<!--              <span class="stats-num">0</span>-->
+<!--            </div>-->
+<!--            <div class="stats-content">-->
+<!--              <span class="stats-text">Нормально</span>-->
+<!--              <span class="stats-num">0</span>-->
+<!--            </div>-->
+<!--            <div class="stats-content">-->
+<!--              <span class="stats-text">Не важно</span>-->
+<!--              <span class="stats-num">0</span>-->
+<!--            </div>-->
+<!--            <div class="stats-content">-->
+<!--              <span class="stats-text">Выполнено</span>-->
+<!--              <span class="stats-num">0</span>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
