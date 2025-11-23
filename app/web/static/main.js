@@ -35,10 +35,47 @@ document.addEventListener("DOMContentLoaded", async () => {
   const userAvatar = document.getElementById("user-avatar-img");
   const fileInput = document.getElementById("fileInput");
   const usernameCaption = document.getElementById("username-caption");
+  const changeAvatar = document.getElementById("ChangeAvatar");
+  const circles = document.querySelectorAll(".circle");
 
   await updateUserData(userAvatar, usernameCaption);
 
+  let taskPriority = 0;
+
+  circles.forEach((circle, index) => {
+    circle.addEventListener("click", () => {
+      // Проверяем, активен ли последний кликнутый круг
+      const isActive = circle.classList.contains("active");
+
+      circles.forEach((c, i) => {
+        if (!isActive && i <= index) {
+          c.classList.remove("active");
+          c.style.backgroundColor = c.dataset.color;
+          circle.classList.add("active");
+        } else {
+          c.classList.remove("active");
+          c.style.backgroundColor = "transparent";
+        }
+      });
+      taskPriority = isActive ? 0 : index + 1;
+    });
+  });
+
+  // Функция для сброса всех кружков в прозрачные
+  function resetCircles() {
+    circles.forEach((circle) => {
+      circle.style.backgroundColor = "transparent";
+    });
+    taskPriority = 0; // сброс приоритета
+  }
+
+  // При клике на элемент userAvatar программно «кликается» по fileInput.
   userAvatar.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  // При клике на элемент userAvatar программно «кликается» по fileInput.
+  changeAvatar.addEventListener("click", () => {
     fileInput.click();
   });
 
@@ -93,19 +130,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
-
-// async function updateAvatar(imgElement) {
-//   try {
-//     const response = await fetch("users/avatar/get");
-//     if (!response.ok) return;
-//
-//     const blob = await response.blob();
-//     const url = URL.createObjectURL(blob);
-//
-//     if (imgElement.src !== url) {
-//       imgElement.src = url;
-//     }
-//   } catch {
-//     // ошибки проглатываются намеренно
-//   }
-// }

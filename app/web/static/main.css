@@ -2,20 +2,26 @@
   box-sizing: border-box;
 }
 
-/*var(--hover)*/
+/*var(--checkbox-color)*/
 :root {
   --test: transparent;
   --main-bg: #0f0f0f;
-  --text-color: white;
   --form-bg: #1d1d1d;
-  --blocks: #1d1d1d;
   --btn-bg: #0071e3;
+  --btn-bg2: #3671dd;
+  --btn-bg-deactive: #262626;
+  --blocks-bg: #18181b;
+  --text-color: white;
   --txt-color-dark: #1d1d1f;
   --input-color: #262626;
-  --btn-bg-deactive: #262626;
   --border-color: #3d3d3d;
   --icons-color: white;
   --hover: #0056b3;
+  --checkbox-color: #262626;
+  --stats-blocks-bg: #181818;
+  --search-header-bg: #282829;
+  --search-bg: #3b3b3c;
+  --content-wrap: #181818;
 }
 
 #logoutButton {
@@ -25,6 +31,7 @@
 
 html,
 body {
+  margin: 0;
   color: var(--text-color);
   width: 100%;
   height: 100%;
@@ -43,13 +50,13 @@ body {
   width: 100%;
   height: 100%;
   grid-gap: 0;
-  grid-template-columns: 300px auto;
+  grid-template-columns: minmax(100px, 250px) auto;
   grid-template-rows: 80px auto;
   grid-template-areas: "menu search" "menu content";
 }
 
 #search {
-  background: var(--input-color);
+  background: var(--search-bg);
   color: var(--text-color);
   border-radius: 16px;
   margin-left: 1em;
@@ -57,7 +64,7 @@ body {
 
 .search-wrap {
   grid-area: search;
-  background: var(--main-bg);
+  background: var(--search-header-bg);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -109,7 +116,6 @@ body {
   height: 32px;
   margin: 0;
   padding: 0;
-  margin-left: 0.5em;
 }
 
 .search-wrap .user-actions button svg {
@@ -130,24 +136,24 @@ body {
 
 .menu-wrap {
   grid-area: menu;
-  padding-bottom: 3em;
-  overflow: auto;
+  /*overflow: auto;*/
   background: var(--main-bg);
   border-right: 1px solid var(--border-color);
 }
 
 .menu-wrap .user {
-  height: 80px;
+  margin-top: 2em;
+  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  margin: 0;
-  padding: 0 3em;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .menu-wrap .user .user-avatar {
-  width: 40px;
-  height: 40px;
+  margin-top: 1em;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   overflow: hidden;
 }
@@ -160,17 +166,17 @@ body {
 }
 
 .menu-wrap .user figcaption {
-  margin: 0;
-  padding: 0 0 0 1em;
+  margin-top: 1em;
+  padding: 0 0 0 1.5em;
   color: var(--text-color);
   font-weight: 700;
-  font-size: 0.875em;
+  font-size: 1em;
   line-height: 100%;
 }
 
 .menu-wrap nav {
   display: block;
-  padding: 0 3em;
+  padding-left: 2em;
 }
 
 .menu-wrap nav section {
@@ -179,23 +185,25 @@ body {
 }
 
 .menu-wrap nav h3 {
-  margin: 0;
+  padding-bottom: 1em;
   font-size: 0.875em;
   text-transform: uppercase;
   color: var(--text-color);
   font-weight: 600;
+  text-align: center;
 }
 
 .menu-wrap nav ul {
   display: block;
   padding: 0;
-  margin: 0;
+  margin-top: 1em;
 }
 
 .menu-wrap nav li {
   display: block;
   padding: 0;
-  margin: 1em 0 0;
+  margin-top: 1em;
+  font-size: 16px;
 }
 
 .menu-wrap nav li a {
@@ -240,166 +248,164 @@ body {
 
 .content-wrap {
   grid-area: content;
-  padding: 3em;
+  padding: 2em 3em;
   overflow: auto;
+  background: var(--content-wrap);
 }
 
+/*Скрыто display: flex*/
 .content-wrap .content-head {
-  display: flex;
+  display: none;
   align-items: center;
-  justify-content: space-between;
+  height: 10%;
+  min-height: 80px;
 }
 
-.content-wrap .content-head h1 {
-  font-size: 1.375em;
-  line-height: 100%;
-  color: var(--text-color);
-  font-weight: 500;
-  margin: 0;
-  padding: 0;
-}
-
-.content-wrap .content-head .action button {
-  border: 0;
-  background: var(--btn-bg);
-  color: var(--main-bg);
-  width: auto;
-  height: 3.5em;
-  padding: 0 2.25em;
-  border-radius: 3.5em;
-  font-size: 1em;
-  text-transform: uppercase;
-  font-weight: 600;
-  transition: background-color 0.15s ease;
-}
-
-.content-wrap .content-head .action button:hover {
-  background-color: var(--hover);
-}
-
-.content-wrap .content-head .action button:hover:active {
-  background-color: var(--hover);
-  transition: none;
-}
-
-.content-wrap .info-boxes {
-  padding: 3em 0 2em;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  grid-gap: 2em;
-}
-
-.content-wrap .info-boxes .info-box {
-  background: var(--main-bg);
-  height: 100px; /*160*/
+.content-wrap .content-head .stats-container {
   display: flex;
+  justify-content: center;
+  height: 60%;
+  gap: 5em;
+  font-size: 17px;
+  width: 100%;
+}
+
+.content-wrap .content-head .stats-container .stats-content {
+  background: var(--stats-blocks-bg);
+  display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: flex-start;
-  padding: 0 3em;
+  gap: 0.5em;
   border: 1px solid var(--border-color);
-  border-radius: 5px;
-}
-
-.content-wrap .info-boxes .info-box .box-icon svg {
-  display: block;
-  width: 48px;
-  height: 48px;
-}
-
-.content-wrap .info-boxes .info-box .box-icon svg path,
-.content-wrap .info-boxes .info-box .box-icon svg circle {
-  fill: var(--text-color);
-}
-
-.content-wrap .info-boxes .info-box .box-content {
-  padding-left: 1.25em;
-  white-space: nowrap;
-}
-
-.content-wrap .info-boxes .info-box .box-content .big {
-  display: block;
-  font-size: 2em;
-  line-height: 150%;
-  color: var(--text-color);
-}
-
-.content-wrap .info-boxes .info-box.active svg circle,
-.content-wrap .info-boxes .info-box.active svg path {
-  fill: var(--icons-color);
+  border-radius: 20px;
+  padding: 1em;
 }
 
 .content-wrap .person-boxes {
+  margin: 2em 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /*280 default*/
   grid-gap: 2em;
 }
 
-.content-wrap .person-boxes .person-box {
-  background: var(--main-bg);
-  height: 320px;
-  text-align: center;
-  padding: 3em;
+.content-wrap .person-boxes .task-container {
+  background: #1d1d1d;
   border: 1px solid var(--border-color);
-  border-radius: 5px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
 }
 
-.content-wrap .person-boxes .person-box:nth-child(2n) .box-avatar .no-name {
-  background: var(--hover);
+.content-wrap .person-boxes .task-container .card-header {
+  margin-top: 1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
 }
 
-.content-wrap .person-boxes .person-box:nth-child(5n) .box-avatar .no-name {
-  background: var(--hover);
+.content-wrap .person-boxes .task-container .card-header input {
+  border: none;
+  outline: none;
+  max-width: 200px;
+  border-radius: 10px;
+  margin-left: 1em;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.content-wrap .person-boxes .person-box .box-avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  margin: 0 auto;
-  overflow: hidden;
-}
-
-.content-wrap .person-boxes .person-box .box-avatar img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.content-wrap .person-boxes .person-box .box-avatar .no-name {
+.content-wrap .person-boxes .task-container .card-header .card-circles {
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: var(--main-bg);
-  font-size: 1.5em;
-  font-weight: 600;
-  text-transform: uppercase;
-  width: 100%;
-  height: 100%;
-  background: var(--hover);
+  gap: 5px;
+  box-sizing: border-box;
+  margin-right: 1em;
 }
 
-.content-wrap .person-boxes .person-box .box-bio {
-  white-space: no-wrap;
+.content-wrap .person-boxes .task-container .card-header .card-circles .circle {
+  width: 13px;
+  height: 13px;
+  border: 1px solid #aaa;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
-.content-wrap .person-boxes .person-box .box-bio .bio-name {
-  margin: 2em 0 0.75em;
+.content-wrap .person-boxes .card-content {
+  background: #262626;
+  border: 1px solid var(--border-color);
+  min-height: 80px;
+  border-radius: 10px;
+  margin: 0.7em 0.5em 0.5em 0.5em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.content-wrap .person-boxes .card-content .card-content-text textarea {
+  border: none;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 10px;
+  margin: 0.5em;
+  background: #262626;
   color: var(--text-color);
+  width: 95%;
+}
+
+.content-wrap .person-boxes .card-content .card-content-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.content-wrap .person-boxes .card-content .card-content-footer .card-btn {
+  border-radius: 5px;
+  border: none;
+  padding: 0.5em;
+  font-size: 12px;
+  margin: 0.5em;
+  background: var(--btn-bg);
+  color: var(--text-color);
+}
+
+.content-wrap .person-boxes .box-bio {
+  background: var(--blocks-bg);
+  height: 220px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  display: grid;
+  grid-template-rows: 20% 20% 60%;
+}
+
+.content-wrap .person-boxes .box-bio .bio-name {
+  color: var(--text-color);
+  margin: 0;
   font-size: 1em;
   font-weight: 700;
   line-height: 100%;
+  grid-row: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.content-wrap .person-boxes .person-box .box-bio .bio-position {
+.content-wrap .person-boxes .box-bio .bio-position {
   margin: 0;
   font-size: 0.875em;
   line-height: 100%;
+  grid-row: 3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.content-wrap .person-boxes .person-box .box-actions {
+.content-wrap .person-boxes .box-actions {
   margin-top: 1.25em;
   padding-top: 1.25em;
   width: 100%;
@@ -409,7 +415,7 @@ body {
   justify-content: space-between;
 }
 
-.content-wrap .person-boxes .person-box .box-actions button {
+.content-wrap .person-boxes .box-actions button {
   border: 0;
   background: none;
   width: 32px;
@@ -418,19 +424,19 @@ body {
   padding: 0;
 }
 
-.content-wrap .person-boxes .person-box .box-actions button svg {
+.content-wrap .person-boxes .box-actions button svg {
   position: relative;
   top: 2px;
 }
 
-.content-wrap .person-boxes .person-box .box-actions button svg path,
-.content-wrap .person-boxes .person-box .box-actions button svg circle {
+.content-wrap .person-boxes .box-actions button svg path,
+.content-wrap .person-boxes .box-actions button svg circle {
   fill: var(--icons-color);
   transition: fill 0.15s ease;
 }
 
-.content-wrap .person-boxes .person-box .box-actions button:hover svg path,
-.content-wrap .person-boxes .person-box .box-actions button:hover svg circle {
+.content-wrap .person-boxes .box-actions button:hover svg path,
+.content-wrap .person-boxes .box-actions button:hover svg circle {
   fill: var(--hover);
 }
 
@@ -438,4 +444,79 @@ body {
   box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.4);
   transform: scale(1.05);
   transition: all 0.3s ease;
+}
+
+#switch-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  grid-row: 1;
+}
+
+.checkbox-wrapper:hover .check {
+  stroke-dashoffset: 0;
+}
+
+.checkbox-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+}
+
+.checkbox-wrapper .background {
+  fill: var(--checkbox-color);
+  transition: ease all 0.6s;
+  -webkit-transition: ease all 0.6s;
+}
+
+.checkbox-wrapper .stroke {
+  fill: none;
+  stroke: #fff;
+  stroke-miterlimit: 10;
+  stroke-width: 2px;
+  stroke-dashoffset: 100;
+  stroke-dasharray: 100;
+  transition: ease all 0.6s;
+  -webkit-transition: ease all 0.6s;
+}
+
+.checkbox-wrapper .check {
+  fill: none;
+  stroke: #fff;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2px;
+  stroke-dashoffset: 22;
+  stroke-dasharray: 22;
+  transition: ease all 0.6s;
+  -webkit-transition: ease all 0.6s;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  margin: 0;
+  opacity: 0;
+  -appearance: none;
+  -webkit-appearance: none;
+}
+
+.checkbox-wrapper input[type="checkbox"]:hover {
+  cursor: pointer;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + svg .background {
+  fill: green;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + svg .stroke {
+  stroke-dashoffset: 0;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + svg .check {
+  stroke-dashoffset: 0;
 }
