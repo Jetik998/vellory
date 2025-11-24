@@ -39,7 +39,9 @@ body {
   background: var(--main-bg);
   font-size: 16px;
   line-height: 120%;
-  font-family: "Open Sans", Helvetica, sans-serif;
+  font-family: "Segoe UI", "Noto Sans", "Open Sans", Helvetica, sans-serif;
+  font-weight: normal;
+  font-style: normal;
 }
 
 .dashboard {
@@ -198,7 +200,7 @@ body {
   display: block;
   padding: 0;
   margin-top: 1em;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .menu-wrap nav li a {
@@ -282,6 +284,8 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /*280 default*/
   grid-gap: 2em;
+  row-gap: 2em;
+  grid-auto-rows: 180px;
 }
 
 .content-wrap .person-boxes .task-container {
@@ -291,10 +295,22 @@ body {
   display: none;
   flex-direction: column;
   max-width: 300px;
+  align-self: start;
+}
+
+.content-wrap .person-boxes .task-container .up {
+  display: flex;
+  justify-content: space-between;
+}
+
+.content-wrap .person-boxes .task-container .up span {
+  font-size: 14px;
+  margin: 0.7em 0 0 1em;
+  color: gray;
 }
 
 .content-wrap .person-boxes .task-container .card-header {
-  margin-top: 1em;
+  margin-top: 0.7em;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -305,7 +321,7 @@ body {
   outline: none;
   max-width: 200px;
   border-radius: 10px;
-  margin-left: 1em;
+  margin-left: 0.8em;
   background: transparent;
   color: var(--text-color);
   font-size: 15px;

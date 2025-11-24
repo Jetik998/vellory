@@ -136,6 +136,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         .forEach((btn) => (btn.style.display = "none"));
       // Увеличить счетчик
       incrementTaskId();
+      // Cброса флага состояния создания задачи
+      resetTaskFlag();
     }
 
     cancel() {
@@ -146,6 +148,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Очищаем ссылки (необязательно, но полезно для сборщика мусора)
       this.card = null;
+      // Cброса флага состояния создания задачи
+      resetTaskFlag();
     }
   }
 
@@ -161,11 +165,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     return taskCounter++;
   }
 
+  let createTaskButtonClicked = false;
   const createTaskBtn = document.getElementById("create-task");
   // Обработчик кнопки создания задач
   createTaskBtn.addEventListener("click", () => {
-    new TaskCard();
+    if (!createTaskButtonClicked) {
+      // Первый клик
+      new TaskCard();
+      createTaskButtonClicked = true; // включаем флаг
+    } else {
+      // Повторный клик — показываем уведомление
+      alert("Завершите создание задачи или отмените.");
+    }
   });
+  // Пример сброса флага где-то в коде
+  function resetTaskFlag() {
+    createTaskButtonClicked = false;
+  }
 
   // При клике на элемент userAvatar программно «кликается» по fileInput.
   userAvatar.addEventListener("click", () => {
