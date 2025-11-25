@@ -13,8 +13,9 @@ async function getUser() {
 async function updateUserData(imgElement, usernameElement) {
   const user = await getUser();
   const defaultAvatarLink =
-    "https://images.icon-icons.com/1378/PNG/512/avatardefault_92824.png";
+    window.location.origin + "/avatars/default-avatar.png";
   const baseAvatar = window.location.origin + "/avatars/background-avatar.png";
+
   console.log(imgElement.src);
   if (user) {
     usernameElement.textContent = user.username;
@@ -65,6 +66,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Настраиваем обработку кликов по кругам приоритетов
       this.setupPriorityCircles();
 
+      this.saveHandler = this.save.bind(this);
+      this.cancelHandler = this.cancel.bind(this);
+      this.priorityHandlers = []; // для кругов приоритета
+
       // Добавляем новую карточку в контейнер на странице
       document.querySelector(".person-boxes").appendChild(this.card);
     }
@@ -79,21 +84,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupSaveButton() {
       this.card
         .querySelector(".card-btn-save")
-        .addEventListener("click", () => this.save());
+        .addEventListener("click", this.saveHandler);
     }
     setupCancelButton() {
       this.card
         .querySelector(".card-btn-cancel")
-        .addEventListener("click", () => this.cancel());
+        .addEventListener("click", this.cancelHandler);
     }
 
     // Метод для настройки кликов по кругам приоритетов
     setupPriorityCircles() {
       const circles = this.card.querySelectorAll(".circle");
       circles.forEach((circle, index) => {
-        circle.addEventListener("click", () =>
-          this.togglePriority(circles, index),
-        );
+        const handler = () => this.togglePriority(circles, index); // сохраняем функцию в переменную
+        circle.addEventListener("click", handler); // навешиваем обработчик
+        this.priorityHandlers[index] = handler; // сохраняем ссылку для удаления
       });
     }
 
@@ -142,12 +147,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     cancel() {
       // Удаляем карточку из DOM
-      if (this.card && this.card.parentNode) {
-        this.card.parentNode.removeChild(this.card);
-      }
+      // 1. Снять все обработчики
+      this.card
+        .querySelector(".card-btn-save")
+        ?.removeEventListener("click", this.saveHandler);
+      this.card
+        .querySelector(".card-btn-cancel")
+        ?.removeEventListener("click", this.cancelHandler);
+      this.card.querySelectorAll(".circle").forEach((circle, index) => {
+        circle.removeEventListener("click", this.priorityHandlers[index]);
+      });
 
-      // Очищаем ссылки (необязательно, но полезно для сборщика мусора)
+      // 2. Удалить элемент из DOM
+      this.card.remove();
+
+      // 3. Обнулить ссылки
       this.card = null;
+      this.saveHandler = null;
+      this.cancelHandler = null;
+      this.priorityHandlers = null;
       // Cброса флага состояния создания задачи
       resetTaskFlag();
     }
