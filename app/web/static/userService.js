@@ -1,0 +1,31 @@
+// Получить пользователя
+export async function getUser() {
+  try {
+    const response = await fetch("/users/me");
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+// Обновляет имя пользователя и аватар, если аватар не загружен пользователем, устанавливает стандарный.
+export async function updateUserData(user, imgElement, usernameElement) {
+  const defaultAvatarLink =
+    window.location.origin + "/avatars/default-avatar.png";
+  const baseAvatar = window.location.origin + "/avatars/background-avatar.png";
+
+  console.log(imgElement.src);
+  if (user) {
+    usernameElement.textContent = user.username;
+    if (user.avatar && imgElement.src !== user.avatar) {
+      imgElement.src = user.avatar;
+    } else if (imgElement.src === baseAvatar) {
+      imgElement.src = defaultAvatarLink;
+    }
+  } else {
+    if (imgElement.src === baseAvatar) {
+      imgElement.src = defaultAvatarLink;
+    }
+  }
+}
