@@ -1,5 +1,5 @@
-import * as userService from "./userService.js";
-import { setupCreateTaskButton } from "./taskService";
+import { setupUser } from "./userService.js";
+import { setupCreateTask } from "./taskService.js";
 import { setupAvatar } from "./avatars.js";
 import { setupLogout } from "./logout.js";
 
@@ -11,9 +11,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const changeAvatar = document.getElementById("ChangeAvatar");
   const createTaskBtn = document.getElementById("create-task");
 
-  const user = await userService.getUser();
-  await userService.updateUserData(user, userAvatar, usernameCaption);
-  setupCreateTaskButton(createTaskBtn);
+  const taskTemplate = document.querySelector(".task-container");
+  const taskContainer = document.querySelector(".person-boxes");
+
+  // Получить пользователя
+
+  await setupUser(userAvatar, usernameCaption);
+  setupCreateTask(createTaskBtn, taskTemplate, taskContainer);
   setupAvatar(userAvatar, changeAvatar, fileInput);
   setupLogout(logoutButton);
 });

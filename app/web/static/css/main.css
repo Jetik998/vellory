@@ -1,5 +1,46 @@
+/* Regular */
+@font-face {
+  font-family: "Lato";
+  src:
+    url("../fonts/Lato-Regular.woff2") format("woff2"),
+    url("../fonts/Lato-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Medium */
+@font-face {
+  font-family: "Lato";
+  src:
+    url("../fonts/Lato-Medium.woff2") format("woff2"),
+    url("../fonts/Lato-Medium.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* SemiBold */
+@font-face {
+  font-family: "Lato";
+  src:
+    url("../fonts/Lato-Semibold.woff2") format("woff2"),
+    url("../fonts/Lato-Semibold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* Bold */
+@font-face {
+  font-family: "Lato";
+  src:
+    url("../fonts/Lato-Bold.woff2") format("woff2"),
+    url("../fonts/Lato-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
 * {
   box-sizing: border-box;
+  font-family: "Lato", "Segoe UI", "Noto Sans", sans-serif;
 }
 
 /*var(--checkbox-color)*/
@@ -39,9 +80,6 @@ body {
   background: var(--main-bg);
   font-size: 16px;
   line-height: 120%;
-  font-family: "Segoe UI", "Noto Sans", "Open Sans", Helvetica, sans-serif;
-  font-weight: normal;
-  font-style: normal;
 }
 
 .dashboard {
@@ -209,7 +247,7 @@ body {
   justify-content: flex-start;
   color: var(--text-color);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 0.875em;
   transition: color 0.15s ease;
 }
@@ -316,7 +354,7 @@ body {
   align-items: center;
 }
 
-.content-wrap .person-boxes .task-container .card-header input {
+.content-wrap .person-boxes .task-container .card-header .card-title-input {
   border: none;
   outline: none;
   max-width: 200px;
@@ -325,7 +363,7 @@ body {
   background: transparent;
   color: var(--text-color);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .content-wrap .person-boxes .task-container .card-header .card-circles {

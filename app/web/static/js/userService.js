@@ -1,5 +1,5 @@
 // Получить пользователя
-export async function getUser() {
+async function getUser() {
   try {
     const response = await fetch("/users/me");
     if (!response.ok) return null;
@@ -10,12 +10,13 @@ export async function getUser() {
 }
 
 // Обновляет имя пользователя и аватар, если аватар не загружен пользователем, устанавливает стандарный.
-export async function updateUserData(user, imgElement, usernameElement) {
+export async function setupUser(imgElement, usernameElement) {
+  const user = await getUser();
   const defaultAvatarLink =
     window.location.origin + "/avatars/default-avatar.png";
   const baseAvatar = window.location.origin + "/avatars/background-avatar.png";
-
-  console.log(imgElement.src);
+  console.log(user);
+  // console.log(imgElement.src);
   if (user) {
     usernameElement.textContent = user.username;
     if (user.avatar && imgElement.src !== user.avatar) {

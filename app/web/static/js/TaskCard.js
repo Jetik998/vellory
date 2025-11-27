@@ -2,9 +2,8 @@ import * as taskUtils from "./taskUtils.js";
 
 // Класс задачи
 export default class TaskCard {
-  constructor() {
+  constructor(template, container) {
     // Находим шаблон карточки задачи на странице
-    const template = document.querySelector(".task-container");
 
     // Уникальный идентификатор задачи
     this.id = taskUtils.getCurrentTaskId();
@@ -16,7 +15,9 @@ export default class TaskCard {
     this.card.id = `task-${this.id}`;
     // Делаем карточку видимой (по умолчанию, возможно, скрыта в шаблоне)
     this.card.style.display = "flex";
-
+    this.saveHandler = this.save.bind(this);
+    this.cancelHandler = this.cancel.bind(this);
+    this.priorityHandlers = []; // для кругов приоритета
     // Устанавливаем номер задачи на карточке
     this.setTaskNumber();
     // Настраиваем кнопку сохранения
@@ -26,12 +27,8 @@ export default class TaskCard {
     // Настраиваем обработку кликов по кругам приоритетов
     this.setupPriorityCircles();
 
-    this.saveHandler = this.save.bind(this);
-    this.cancelHandler = this.cancel.bind(this);
-    this.priorityHandlers = []; // для кругов приоритета
-
     // Добавляем новую карточку в контейнер на странице
-    document.querySelector(".person-boxes").appendChild(this.card);
+    container.appendChild(this.card);
   }
 
   // Метод для отображения номера задачи
@@ -82,7 +79,7 @@ export default class TaskCard {
 
     // Сохраняем текущий уровень приоритета
     this.taskPriority = isActive ? 0 : index + 1;
-    console.log(`Task #${this.id} priority:`, this.taskPriority);
+    // console.log(`Task #${this.id} priority:`, this.taskPriority);
   }
 
   // Метод для "сохранения" задачи
@@ -127,6 +124,6 @@ export default class TaskCard {
     this.cancelHandler = null;
     this.priorityHandlers = null;
     // Cброса флага состояния создания задачи
-    resetTaskFlag();
+    taskUtils.resetTaskFlag();
   }
 }
