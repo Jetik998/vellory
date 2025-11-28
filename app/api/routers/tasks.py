@@ -12,7 +12,7 @@ from app.crud.tasks import (
 )
 from app.enums import Tags
 from app.schemas.tasks import (
-    TaskCreate,
+    TaskBase,
     TaskResponse,
     EditTask,
     CreateTaskResponse,
@@ -30,7 +30,7 @@ router = APIRouter(prefix="/api/tasks", tags=[Tags.items])
     response_description="Задача создана",
 )
 async def create_task(
-    task: TaskCreate,
+    task: TaskBase,
     session: SessionDep,
     user: CurrentUserDep,
 ):

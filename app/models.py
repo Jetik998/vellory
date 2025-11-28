@@ -21,10 +21,11 @@ class Task(Base):
     description: Mapped[str] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=time)
     completed: Mapped[bool] = mapped_column(default=False)
+    priority: Mapped[int] = mapped_column(default=0)
     user: Mapped["User"] = relationship(back_populates="tasks")
 
     def __repr__(self):
-        return f"Task(id={self.id}, title={self.title}, description={self.description}, created_at={self.created_at}, completed={self.completed})"
+        return f"Task(id={self.id}, title={self.title}, description={self.description}, created_at={self.created_at}, completed={self.completed}, priority={self.priority})"
 
 
 class User(Base):

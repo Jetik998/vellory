@@ -10,11 +10,6 @@ export function getTaskFlag() {
   return createTaskButtonClicked;
 }
 
-// Пример сброса флага где-то в коде
-export function resetTaskFlag() {
-  createTaskButtonClicked = false;
-}
-
 let taskCounter = 1;
 
 // Функция возвращает текущий последний ID без изменения счётчика
