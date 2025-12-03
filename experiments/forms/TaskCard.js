@@ -1,14 +1,15 @@
-// import * as taskUtils from "./taskUtils.js";
+// import * as taskUtils from "../../app/web/static/js/taskUtils.js";
 //
 // // Класс задачи
 // export default class TaskCard {
-//   constructor(template, container) {
-//     // Находим шаблон карточки задачи на странице
+//   constructor(id, title, description, completed, created_at, priority) {
+//     this.id = id; // уникальный идентификатор задачи
+//     this.title = title; // заголовок
+//     this.description = description; // описание
+//     this.completed = completed; // выполнена ли задача
+//     this.created_at = created_at; // дата создания
+//     this.priority = priority; // приоритет: число от 0 до 3
 //
-//     // Уникальный идентификатор задачи
-//     this.id = taskUtils.getCurrentTaskId();
-//     // Приоритет задачи по умолчанию 0 (не установлен)
-//     this.taskPriority = 0;
 //     // Клонируем шаблон карточки, чтобы создать новую
 //     this.card = template.cloneNode(true);
 //     // Присваиваем уникальный id элементу карточки

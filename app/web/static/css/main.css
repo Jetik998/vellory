@@ -296,7 +296,7 @@ body {
   min-height: 80px;
 }
 
-.content-wrap .content-head .stats-container {
+.content-head .stats-container {
   display: flex;
   justify-content: center;
   height: 60%;
@@ -305,7 +305,7 @@ body {
   width: 100%;
 }
 
-.content-wrap .content-head .stats-container .stats-content {
+.stats-container .stats-content {
   background: var(--stats-blocks-bg);
   display: flex;
   justify-content: center;
@@ -336,25 +336,60 @@ body {
   align-self: start;
 }
 
-.content-wrap .person-boxes .task-container .up {
+.task-container .up {
   display: flex;
   justify-content: space-between;
 }
 
-.content-wrap .person-boxes .task-container .up span {
+.up span {
   font-size: 14px;
   margin: 0.7em 0 0 1em;
   color: gray;
 }
 
-.content-wrap .person-boxes .task-container .card-header {
+.up .task-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.3em 0.3em 0 0;
+}
+
+.task-btn .card-btn-cancel {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  color: white;
+}
+
+.task-btn .change-btn {
+  width: 28px;
+  height: 28px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  color: white;
+}
+
+.icon-btn svg {
+  font-size: 20px;
+}
+
+.task-container .card-header {
   margin-top: 0.7em;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.content-wrap .person-boxes .task-container .card-header .card-title-input {
+.task-container .card-header .card-title-input {
   border: none;
   outline: none;
   max-width: 200px;
@@ -373,7 +408,7 @@ body {
   margin-right: 1em;
 }
 
-.content-wrap .person-boxes .task-container .card-header .card-circles .circle {
+.card-circles .circle {
   width: 13px;
   height: 13px;
   border: 1px solid #aaa;
@@ -392,7 +427,7 @@ body {
   justify-content: space-between;
 }
 
-.content-wrap .person-boxes .card-content .card-content-text textarea {
+.card-content .card-content-text textarea {
   border: none;
   outline: none;
   resize: none;
@@ -404,19 +439,27 @@ body {
   width: 95%;
 }
 
-.content-wrap .person-boxes .card-content .card-content-footer {
+.card-content .card-content-footer {
   display: flex;
   justify-content: flex-end;
 }
 
-.content-wrap .person-boxes .card-content .card-content-footer .card-btn {
-  border-radius: 5px;
+.card-content .card-content-footer .card-btn-save {
+  width: 37px;
+  height: 37px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: transparent;
   border: none;
-  padding: 0.5em;
-  font-size: 12px;
-  margin: 0.5em;
-  background: var(--btn-bg);
-  color: var(--text-color);
+  color: white;
+}
+
+.card-content-footer .card-btn-save svg {
+  padding: 0;
+  display: block;
+  font-size: 30px;
 }
 
 .content-wrap .person-boxes .box-bio {
