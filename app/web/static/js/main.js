@@ -2,6 +2,7 @@ import { setupUser } from "./userService.js";
 import { setupAvatar } from "./avatars.js";
 import { setupLogout } from "./logout.js";
 import TaskManager from "./TaskManager.js";
+import Api from "./Api.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
   const logoutButton = document.getElementById("logoutButton");
@@ -13,7 +14,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const createTaskBtn = document.getElementById("create-task");
   const taskContainer = document.querySelector(".person-boxes");
 
-  const taskManager = new TaskManager(
+  const api = new Api();
+
+  window.taskManager = new TaskManager(
+    api,
     taskTemplate,
     createTaskBtn,
     taskContainer,

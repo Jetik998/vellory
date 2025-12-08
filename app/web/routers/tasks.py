@@ -1,7 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Path
-from starlette import status
+from fastapi import APIRouter, HTTPException, Path, status
 
 from app.api.dependencies import SessionDep, CurrentUserFromCookieRefreshLenient
 from app.core.utils import save_and_refresh

@@ -62,14 +62,14 @@ class TaskResponse(TaskID, TaskBase):
     ]
     priority: Annotated[
         int,
-        Field(..., description="Приоритет задачи (0–3)", ge=0, le=3, examples=[2]),
+        Field(..., description="Приоритет задачи (0–3)", ge=-1, le=2, examples=[2]),
     ]
 
 
 class CreateTask(TaskBase):
     priority: Annotated[
         int,
-        Field(default=0, description="Приоритет задачи (0–3)", examples=[2]),
+        Field(default=-1, description="Приоритет задачи (-1:2)", examples=[2]),
     ]
 
     model_config = {
