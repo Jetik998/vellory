@@ -50,6 +50,7 @@
   --form-bg: #1d1d1d;
   --btn-bg: #0071e3;
   --btn-bg2: #3671dd;
+  --hover: #0056b3;
   --btn-bg-deactive: #262626;
   --blocks-bg: #18181b;
   --text-color: white;
@@ -57,12 +58,13 @@
   --input-color: #262626;
   --border-color: #3d3d3d;
   --icons-color: #7faae7;
-  --hover: #0056b3;
   --checkbox-color: #262626;
   --stats-blocks-bg: #181818;
   --search-header-bg: #282829;
   --search-bg: #3b3b3c;
   --content-wrap: #181818;
+  --complete: #23a14a;
+  --complete-hover: #1a8139;
 }
 
 #logoutButton {
@@ -444,7 +446,7 @@ body {
   justify-content: flex-end;
 }
 
-.card-content .card-content-footer .card-btn-save {
+.card-content .card-content-footer .card-btn-down {
   width: 37px;
   height: 37px;
   display: flex;
@@ -453,10 +455,27 @@ body {
   cursor: pointer;
   background-color: transparent;
   border: none;
-  color: white;
 }
 
-.card-content-footer .card-btn-save svg {
+.card-content .card-content-footer .card-btn-save {
+  color: var(--btn-bg);
+  transition: color 0.3s;
+}
+.card-content .card-content-footer .card-btn-save:hover {
+  color: var(--hover);
+}
+
+.card-content .card-content-footer .card-btn-complete {
+  display: none;
+  color: var(--complete);
+  transition: color 0.3s;
+}
+
+.card-content .card-content-footer .card-btn-complete:hover {
+  color: var(--complete-hover);
+}
+
+.card-content-footer .card-btn-down svg {
   padding: 0;
   display: block;
   font-size: 30px;

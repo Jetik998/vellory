@@ -39,11 +39,30 @@ export default class TaskManager {
   }
 
   // Создает форму передавая копию шаблона карточки, родительский контейнер и id
-  createForm() {
-    const uniqueId = Date.now();
-    const form = new Form(this.getTemplateCopy(), this.taskContainer, uniqueId);
+  createForm(id = Date.now(), priority = -1) {
+    const form = new Form(
+      this.getTemplateCopy(),
+      this.taskContainer,
+      id,
+      priority,
+    );
     this.addToForms(form);
     return form;
+  }
+
+  async initTasks() {
+    try {
+      const tasks = await this.api.getAllTasks(); // предполагаем, что API возвращает массив задач
+      console.log("tasks", tasks);
+      tasks.forEach((taskData) => {
+        const form = this.createForm(taskData.id, taskData.priority);
+        form.setFields(taskData); // заполняем поля данными с сервера
+        form.lockForm(); // блокируем форму для редактирования по умолчанию
+        form.created = true; // помечаем, что форма уже создана на сервере
+      });
+    } catch (error) {
+      console.error("Ошибка при загрузке задач с сервера:", error);
+    }
   }
 
   getFormId() {
@@ -60,13 +79,17 @@ export default class TaskManager {
   }
 
   removeForm() {
-    const datasetId = this.getFormId();
-
-    // Удаляем из Map
-    this.forms.delete(datasetId);
-    // Удаляем DOM-элемент
-    this.selectedFormElement.remove();
-    this.selectedFormElement = null;
+    try {
+      const datasetId = this.getFormId();
+      // Удаляем из Map
+      this.forms.delete(datasetId);
+      // Удаляем из Map
+      this.selectedFormElement.remove();
+      this.selectedFormElement = null;
+      console.log("Форма удалена");
+    } catch (error) {
+      console.error("Failed to remove form:", error);
+    }
   }
 
   // Обработчик клика
@@ -94,19 +117,23 @@ export default class TaskManager {
 
   // Если создается впервые
   // Если уже была создана
-  handleCancel() {
-    if (this.selectedForm.created) {
-      console.log("Задача уже создана");
-    } else {
-      try {
-        this.removeForm();
-        console.log("Форма удалена");
-      } catch (error) {
-        console.error("Failed to send task:", error);
+  async handleCancel() {
+    const form = this.selectedForm;
+    if (!form) return;
+    if (form.created) {
+      const data = await this.api.deleteTask(form.id);
+      if (!data.success) {
+        console.log(data);
+        return;
       }
     }
+
+    this.removeForm();
   }
 
+  //Отправляет данные формы на сервер
+  //Если карточка создается впервые, создаем задачу.
+  //Иначе изменяем задачу.
   async refreshFormData() {
     const form = this.selectedForm;
     //Собирает данные формы
@@ -116,7 +143,7 @@ export default class TaskManager {
     let taskData;
 
     if (form.created) {
-      taskData = await this.api.editTask(form.dbId, data);
+      taskData = await this.api.editTask(form.id, data);
       console.log("Данные с сервера после изменения", taskData);
     } else {
       //Отправляет данные формы на сервер, возвращает данные из БД
@@ -151,7 +178,7 @@ export default class TaskManager {
       try {
         // Обработка кнокпи Отменить
         if (target.closest(".card-btn-cancel")) {
-          this.handleCancel();
+          await this.handleCancel();
         }
 
         // Обработка кнокпи Сохарнить

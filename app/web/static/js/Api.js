@@ -21,6 +21,31 @@ export default class Api {
     }
   }
 
+  async getAllTasks(filters = {}) {
+    const params = new URLSearchParams();
+
+    // Добавляем параметры
+    params.append("completed", false);
+    params.append("order_by_created", true);
+
+    //Формируем путь
+    const url = this.baseUrl + "/?" + params.toString();
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+      });
+      console.log("getalltasksresponse", response);
+
+      return await this.handleFetchResponse(
+        response,
+        "Задачи успешно получены!",
+      );
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   //Создать задачу
   async createTask(data) {
     try {
@@ -51,6 +76,22 @@ export default class Api {
       return await this.handleFetchResponse(
         response,
         "Задача успешно изменена!",
+      );
+    } catch (error) {
+      this.handleError(error); // обработка сетевых ошибок
+    }
+  }
+
+  //Удалить
+  async deleteTask(id) {
+    try {
+      const response = await fetch(`${this.baseUrl}/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      return await this.handleFetchResponse(
+        response,
+        "Задача успешно удалена!",
       );
     } catch (error) {
       this.handleError(error); // обработка сетевых ошибок

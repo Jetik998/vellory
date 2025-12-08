@@ -1,5 +1,5 @@
 export default class Form {
-  constructor(template, container, datasetId) {
+  constructor(template, container, datasetId, priority) {
     //Шаблон формы
     this.form = template;
     // Родительский контейнер для формы
@@ -17,7 +17,8 @@ export default class Form {
     this.description = this.form.querySelector(".card-content-input");
     this.formId = this.form.querySelector(".task-number");
 
-    this.dbId = 0;
+    //id с Базы данных
+    this.id = 0;
     this.priority = -1;
     console.log("this.priority", this.priority);
     this.circles = this.form.querySelectorAll(".circle");
@@ -29,6 +30,9 @@ export default class Form {
     this.saveBtn = this.form.querySelector(".card-btn-save");
     this.cancelBtn = this.form.querySelector(".card-btn-cancel");
     this.changeBtn = this.form.querySelector(".change-btn");
+    this.completeBtn = this.form.querySelector(".card-btn-complete");
+
+    this.setPriorityCircles(priority);
   }
 
   // Показать форму
@@ -52,7 +56,7 @@ export default class Form {
     this.description.value = data.description || "";
     this.priority = data.priority != null ? data.priority : -1;
     this.formId.textContent = data.id != null ? "#" + data.id : "";
-    this.dbId = data.id != null ? data.id : 0;
+    this.id = data.id != null ? data.id : 0;
   }
 
   // Переводим в режим просмотра, фиксацией элементов форме
@@ -67,6 +71,7 @@ export default class Form {
     this.saveBtn.style.display = "none";
     this.cancelBtn.style.display = "none";
     this.changeBtn.style.display = "flex";
+    this.completeBtn.style.display = "flex";
   }
 
   // Переводим форму в редактируемый режим
@@ -81,8 +86,9 @@ export default class Form {
     this.saveBtn.style.display = "flex";
     this.cancelBtn.style.display = "flex";
 
-    // Скрываем кнопку изменения
+    // Скрываем кнопки изменения и завершения
     this.changeBtn.style.display = "none";
+    this.completeBtn.style.display = "none";
   }
 
   // Принимает id круга по которому кликнули

@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Path, status
+from fastapi import APIRouter, HTTPException, Path, status, Query
 
 from app.api.dependencies import SessionDep, CurrentUserFromCookieRefreshLenient
 from app.core.utils import save_and_refresh
-from app.crud.tasks import db_create_task, db_get_task
+from app.crud.tasks import db_create_task, db_get_task, db_delete_task, db_get_all_tasks
 from app.enums import Tags
 from app.schemas.tasks import TaskResponse, CreateTask
 
@@ -84,6 +84,33 @@ async def get_task(
     return task
 
 
+@router.get(
+    "/",
+    response_model=list[TaskResponse],
+    response_description="Все задачи отправлены",
+    summary="Получить все задачи",
+)
+# Получить все задачи
+async def get_all_task(
+    session: SessionDep,
+    user: CurrentUserFromCookieRefreshLenient,
+    completed: bool | None = Query(
+        default=None,
+        description="Фильтровать задачи по статусу: выполнено или нет",
+    ),
+    order_by_created: bool | None = Query(
+        default=None,
+        description="Сортировать задачи по дате создания",
+    ),
+):
+    # Пытаемся получить задачу, если не найдено возвращаем ошибку, если найдена
+    tasks = await db_get_all_tasks(session, completed, order_by_created, user.id)
+    if tasks is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    else:
+        return tasks
+
+
 @router.patch(
     "/{task_id}",
     response_model=TaskResponse,
@@ -111,3 +138,22 @@ async def edit_task(
 
     else:
         return new_task
+
+
+@router.delete(
+    "/{task_id}",
+    status_code=status.HTTP_200_OK,
+    response_description="Задача удалена",
+    summary="Удалить задачу",
+)
+async def delete_task(
+    task_id: int,
+    session: SessionDep,
+    user: CurrentUserFromCookieRefreshLenient,
+):
+    # Пытаемся получить задачу, если не найдено возвращаем ошибку.
+    deleted_task_id = await db_delete_task(session, task_id, owner_id=user.id)
+    if deleted_task_id is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    else:
+        return {"success": True, "task_id": deleted_task_id}
