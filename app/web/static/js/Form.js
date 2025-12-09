@@ -25,6 +25,11 @@ export default class Form {
 
     // true если задача создавалась
     this.created = false;
+    // true если задача завершена
+    this.completed = false;
+
+    //Маска
+    this.overlay = this.form.querySelector(".overlay");
 
     // Кнопки
     this.saveBtn = this.form.querySelector(".card-btn-save");
@@ -35,6 +40,20 @@ export default class Form {
     this.setPriorityCircles(priority);
   }
 
+  completedTask() {
+    this.completed = !this.completed;
+    const tick = this.completeBtn.querySelector("#complete-tick");
+    const circle = this.completeBtn.querySelector("#complete-circle");
+    console.log("tick", tick);
+    console.log("tick", circle);
+    tick.classList.toggle("true");
+    tick.classList.toggle("false");
+    circle.classList.toggle("true");
+    circle.classList.toggle("false");
+    this.title.classList.toggle("text-completed");
+    this.description.classList.toggle("text-completed");
+    this.overlay.classList.toggle("active");
+  }
   // Показать форму
   viewForm() {
     // Добавить элемент в контейнер

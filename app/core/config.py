@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     ALGORITHM: str
     EXP_MIN: int
 
+    ACCESS_TOKEN_EXPIRE_SECONDS: int
+    REFRESH_TOKEN_EXPIRE_SECONDS: int
+
     DB_HOST: str
     DB_PORT: int
     DB_USER: str

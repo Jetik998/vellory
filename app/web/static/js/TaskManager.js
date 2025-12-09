@@ -123,7 +123,7 @@ export default class TaskManager {
     if (form.created) {
       const data = await this.api.deleteTask(form.id);
       if (!data.success) {
-        console.log(data);
+        console.log("data", data);
         return;
       }
     }
@@ -156,7 +156,7 @@ export default class TaskManager {
     form.setFields();
     //Устанавливаем поля
     form.setFields(taskData);
-    console.log(form);
+    console.log("form", form);
     form.lockForm();
   }
 
@@ -165,7 +165,7 @@ export default class TaskManager {
   initTaskContainerHandler() {
     this.taskContainer.addEventListener("click", async (event) => {
       const target = event.target; // Элемент, на который кликнули
-      console.log(target);
+      console.log("target", target);
       const selectedForm = target.closest(".task-container");
       if (!selectedForm) return; // Если клик был вне карточки — прекращаем обработку
 
@@ -188,6 +188,10 @@ export default class TaskManager {
 
         if (target.closest(".change-btn")) {
           this.selectedForm.unlockForm();
+        }
+
+        if (target.closest(".card-btn-complete")) {
+          this.selectedForm.completedTask();
         }
 
         //Обработка клика по кругам выбора приоритета

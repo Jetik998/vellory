@@ -336,6 +336,32 @@ body {
   flex-direction: column;
   max-width: 300px;
   align-self: start;
+  position: relative;
+}
+
+/* Стиль для маски */
+.task-container #overlay {
+  *display: none;
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(224, 224, 224, 0.2); /* серый полупрозрачный */
+  border-radius: 10px; /* чтобы совпадало с формой */
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.task-container #overlay.active {
+  /*display: block;*/
+  visibility: visible;
+  opacity: 1;
 }
 
 .task-container .up {
@@ -467,8 +493,34 @@ body {
 
 .card-content .card-content-footer .card-btn-complete {
   display: none;
-  color: var(--complete);
   transition: color 0.3s;
+}
+
+.card-btn-complete #complete-tick.false {
+  visibility: hidden;
+}
+
+.card-btn-complete #complete-tick.true {
+  visibility: visible;
+  stroke: #262626;
+}
+
+.card-btn-complete #complete-circle.false {
+  fill: none;
+  color: transparent;
+  background-color: white;
+  stroke: white;
+  stroke-width: 1;
+}
+
+.card-btn-complete #complete-circle.true {
+  fill: green;
+  color: transparent;
+  background-color: transparent;
+}
+
+.text-completed {
+  text-decoration: line-through;
 }
 
 .card-content .card-content-footer .card-btn-complete:hover {

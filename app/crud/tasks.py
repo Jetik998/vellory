@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.core.utils import save_and_refresh
+from app.core.utils import save_and_refresh, delete_and_commit
 from app.models.task import Task
 from app.schemas.tasks import CreateTask
 
@@ -26,8 +26,7 @@ async def db_delete_task(session, task_id: int, owner_id: int):
     if task is None:
         return None
 
-    await session.delete(task)
-    await session.commit()
+    await delete_and_commit(session, task)
     return task_id
 
 

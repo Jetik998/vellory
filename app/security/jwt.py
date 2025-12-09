@@ -12,7 +12,7 @@ def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = 
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(seconds=5)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=5)
     to_encode.update({"exp": expire, "token_type": TokenType.ACCESS})
     encoded_jwt: str = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
@@ -27,7 +27,7 @@ def create_refresh_token(
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(hours=1)
+        expire = datetime.now(timezone.utc) + timedelta(minutes=10)
     to_encode.update({"exp": expire, "token_type": TokenType.REFRESH})
     encoded_jwt: str = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
@@ -52,7 +52,7 @@ def set_tokens(response, tokens) -> dict[str, str]:
         httponly=True,
         secure=False,
         samesite="lax",
-        max_age=6,
+        max_age=int(timedelta(minutes=15).total_seconds()),
     )
     response.set_cookie(
         key="refresh_token",
@@ -60,7 +60,7 @@ def set_tokens(response, tokens) -> dict[str, str]:
         httponly=True,
         secure=False,
         samesite="lax",
-        max_age=60 * 59,  # 7 дней
+        max_age=int(timedelta(days=5).total_seconds()),
     )
 
     return {
