@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import jwt
-from app.core.config import SECRET_KEY, ALGORITHM
+from app.core.config import settings
 from app.enums.tokens import TokenType
 from app.schemas.users import UserEmail
 
@@ -14,7 +14,9 @@ def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = 
     else:
         expire = datetime.now(timezone.utc) + timedelta(seconds=5)
     to_encode.update({"exp": expire, "token_type": TokenType.ACCESS})
-    encoded_jwt: str = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt: str = jwt.encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
     return encoded_jwt
 
 
@@ -27,7 +29,9 @@ def create_refresh_token(
     else:
         expire = datetime.now(timezone.utc) + timedelta(hours=1)
     to_encode.update({"exp": expire, "token_type": TokenType.REFRESH})
-    encoded_jwt: str = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt: str = jwt.encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
     return encoded_jwt
 
 

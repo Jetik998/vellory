@@ -6,11 +6,11 @@ from jwt import InvalidTokenError, ExpiredSignatureError
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
-from app.core.config import SECRET_KEY, ALGORITHM
+from app.core.config import settings
 from app.core.database import get_session
 from app.crud.users import db_get_user
 from app.enums.tokens import TokenType
-from app.models import User
+from app.models.user import User
 from app.schemas.auth import TokenData, TokenDataUsername
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
@@ -28,7 +28,9 @@ async def get_current_user(token: TokenDep, session: SessionDep):
 
 async def verify_token(token, session: SessionDep):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         username = payload.get("sub")
         if username is None:
             raise UnauthorizedException()
@@ -77,7 +79,9 @@ async def get_current_user_cookie(
 
 def verify_token_cookie(token, expected_token_type, lenient: bool = False):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         email = payload.get("sub")
         token_type: str | None = payload.get("token_type")
 

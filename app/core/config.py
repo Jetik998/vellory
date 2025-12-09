@@ -1,8 +1,28 @@
-from decouple import config
-from datetime import timedelta
 from pathlib import Path
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # корень проекта
-SECRET_KEY = config("SECRET_KEY")
-ALGORITHM = config("ALGORITHM")
-EXP_MIN = timedelta(minutes=int(config("EXP_MIN")))
+ENV_DIR = BASE_DIR / ".env"
+
+
+class Settings(BaseSettings):
+    SECRET_KEY: str
+    ALGORITHM: str
+    EXP_MIN: int
+
+    DB_HOST: str
+    DB_PORT: int
+    DB_USER: str
+    DB_PASS: str
+    DB_NAME: str
+
+    @property
+    def database_url(self) -> str:
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+    model_config = SettingsConfigDict(
+        env_file=ENV_DIR,
+    )
+
+
+settings = Settings()

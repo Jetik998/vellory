@@ -1,3 +1,4 @@
+uliweb-alembic
 fastcrud
 aiofiles==25.1.0
 aiosqlite==0.21.0
@@ -32,4 +33,4 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 uvicorn==0.38.0
 alembic
-psycopg2-binary
+pydantic_settings

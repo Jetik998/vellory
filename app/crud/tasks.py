@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from app.core.utils import save_and_refresh
-from app.models import Task
+from app.models.task import Task
 from app.schemas.tasks import CreateTask
 
 
