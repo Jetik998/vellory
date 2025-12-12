@@ -1,5 +1,5 @@
 export default class Form {
-  constructor(template, container, datasetId, priority) {
+  constructor(template, container, datasetId, priority = -1) {
     // ===== Основные элементы =====
     this.form = template; // Шаблон формы
     this.container = container; // Родительский контейнер для формы
@@ -16,8 +16,8 @@ export default class Form {
     this.overlay = this.form.querySelector(".overlay");
 
     // ===== Идентификаторы и приоритет =====
-    this.id = 0; // id с базы данных
-    this.priority = -1; // Приоритет задачи
+    this.id = 0; // id с бека
+    this.priority = priority; // Приоритет задачи
 
     // ===== Состояния формы =====
     this.created = false; // true, если задача создавалась
@@ -73,6 +73,7 @@ export default class Form {
   // Возвращает данные формы: заголовок, описание и приоритет
   getFormData() {
     return {
+      user_task_id: this.datasetId,
       title: this.title.value,
       description: this.description.value,
       priority: this.priority,
@@ -80,12 +81,18 @@ export default class Form {
   }
 
   // Заполняет поля формы данными из объекта data или сбрасывает их по умолчанию
+  setFormData(data = {}) {
+    this.created = true;
+    this.priority = data.priority != null ? data.priority : -1;
+    this.id = data.id != null ? data.id : 0;
+  }
+
+  // Заполняет поля формы данными из объекта data или сбрасывает их по умолчанию
   setFields(data = {}) {
     this.title.value = data.title || ""; // если data.title нет — пустая строка
     this.description.value = data.description || "";
-    this.priority = data.priority != null ? data.priority : -1;
-    this.formId.textContent = data.id != null ? "#" + data.id : "";
-    this.id = data.id != null ? data.id : 0;
+    this.formId.textContent =
+      data.user_task_id != null ? "#" + data.user_task_id : "";
   }
 
   // Блокирует форму: делает поля и круги некликабельными, показывает/скрывает кнопки

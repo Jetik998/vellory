@@ -9,9 +9,9 @@ export default class TaskManager {
 
     // ===== API =====
     this.api = api; // Объект API для работы с сервером
+    this.lastTaskId = 1;
 
     // ===== Формы =====
-    this.formDatasetId = 0; // id карточки при создании Form
     this.forms = new Map(); // Словарь для хранения форм
 
     // ===== Выбранная карточка =====
@@ -34,15 +34,22 @@ export default class TaskManager {
   }
 
   // Создает новую форму для задачи, добавляет её в словарь и возвращает объект Form
-  createForm(id = Date.now(), priority = -1) {
+  createForm() {
     const form = new Form(
       this.getTemplateCopy(),
       this.taskContainer,
-      id,
-      priority,
+      this.lastTaskId,
     );
     this.addToForms(form);
     return form;
+  }
+
+  refreshData(form, taskData) {
+    form.setFormData(taskData); // Заполнение Form данными с сервера
+    form.setFields(); // Очистка полей
+    form.setFields(taskData); // Заполнение полей данными с сервера
+    // 5. Блокируем форму для редактирования
+    form.lockForm();
   }
 
   // Загружает задачи с сервера, создает формы, заполняет их данными, блокирует и помечает как созданные
@@ -51,14 +58,35 @@ export default class TaskManager {
       const tasks = await this.api.getAllTasks(); // 1. API возвращает массив задач
 
       tasks.forEach((taskData) => {
-        const form = this.createForm(taskData.id, taskData.priority);
-        form.setFields(taskData); // Заполняем поля данными с сервера
-        form.lockForm(); // Блокирует форму, делая её доступной только для просмотра
-        form.created = true; // Изменяем состояние формы, помечая её как созданную
+        const form = this.createForm();
+        this.refreshData(form, taskData);
+        this.lastTaskId++;
       });
     } catch (error) {
       console.error("Ошибка при загрузке задач с сервера:", error);
     }
+  }
+
+  // Обновляет данные формы: создаёт новую или редактирует существующую, затем блокирует форму
+  async refreshFormData() {
+    const form = this.selectedForm;
+    if (!form) return;
+
+    // 1. Собираем данные из формы
+    const data = form.getFormData();
+
+    let taskData;
+
+    if (form.created) {
+      // 2. Если форма уже создана, обновляем данные на сервере
+      taskData = await this.api.editTask(form.id, data);
+    } else {
+      // 3. Если форма новая, создаём её на сервере
+      taskData = await this.api.createTask(data);
+      this.lastTaskId++;
+    }
+
+    this.refreshData(form, taskData);
   }
 
   getFormId() {
@@ -123,35 +151,8 @@ export default class TaskManager {
       }
     }
 
-    // Удаляем форму с интерфейса
+    // Удаляем форму
     this.removeForm();
-  }
-
-  // Обновляет данные формы: создаёт новую или редактирует существующую, затем блокирует форму
-  async refreshFormData() {
-    const form = this.selectedForm;
-    if (!form) return;
-
-    // 1. Собираем данные из формы
-    const data = form.getFormData();
-    console.log("Данные из формы", data);
-
-    let taskData;
-
-    if (form.created) {
-      // 2. Если форма уже создана, обновляем данные на сервере
-      taskData = await this.api.editTask(form.id, data);
-    } else {
-      // 3. Если форма новая, создаём её на сервере
-      taskData = await this.api.createTask(data);
-      form.created = true;
-    }
-
-    // 4. Сбрасываем поля формы и устанавливаем актуальные данные
-    form.setFields(); // Очистка полей
-    form.setFields(taskData); // Заполнение данными с сервера
-    // 5. Блокируем форму для редактирования
-    form.lockForm();
   }
 
   // // Добавляет обработчик кликов по задачам и выполняет действия в зависимости от нажатой кнопки

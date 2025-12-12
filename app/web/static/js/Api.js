@@ -49,6 +49,7 @@ export default class Api {
   //Создать задачу
   async createTask(data) {
     try {
+      console.log("createTask(data)", data);
       const response = await fetch(this.baseUrl + "/create_task", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -9,9 +9,10 @@ from .base import Base
 class Task(Base):
     __tablename__ = "task"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)  # Глобальный id
+    user_task_id: Mapped[int] = mapped_column()  # локальный ID для пользователя
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    title: Mapped[str] = mapped_column(nullable=False)
+    title: Mapped[str] = mapped_column(nullable=True)
     description: Mapped[str] = mapped_column(nullable=True)
     # deadline: Mapped[datetime | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=time)
@@ -20,4 +21,4 @@ class Task(Base):
     user: Mapped["User"] = relationship(back_populates="tasks")  # noqa: F821
 
     def __repr__(self):
-        return f"Task(id={self.id}, title={self.title}, description={self.description}, created_at={self.created_at}, completed={self.completed}, priority={self.priority})"
+        return f"Task(id={self.id}, user_task_id={self.user_task_id}, title={self.title}, description={self.description}, created_at={self.created_at}, completed={self.completed}, priority={self.priority})"

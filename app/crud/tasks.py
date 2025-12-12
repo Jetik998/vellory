@@ -1,12 +1,13 @@
 from sqlalchemy import select
 from app.core.utils import save_and_refresh, delete_and_commit
 from app.models.task import Task
-from app.schemas.tasks import CreateTask
+from app.schemas.tasks import RequestTask
 
 
 # Функция добавления задачи, Создание объекта, добавление в сессию, комит, обновление, возврат id объекта задачи из базы данных
-async def db_create_task(session, task: CreateTask, owner_id: int):
-    db_task = Task(**task.model_dump(), user_id=owner_id)
+async def db_create_task(session, task: RequestTask, owner_id: int):
+    data = task.model_dump()
+    db_task = Task(**data, user_id=owner_id)
     await save_and_refresh(session, db_task)
     return db_task
 

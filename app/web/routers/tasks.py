@@ -6,20 +6,24 @@ from app.api.dependencies import SessionDep, CurrentUserFromCookieRefreshLenient
 from app.core.utils import save_and_refresh
 from app.crud.tasks import db_create_task, db_get_task, db_delete_task, db_get_all_tasks
 from app.enums import Tags
-from app.schemas.tasks import TaskResponse, CreateTask
+from app.schemas.tasks import ResponseTasks, RequestTask, DeleteTask
 
 router = APIRouter(prefix="/tasks", tags=[Tags.web_tasks])
+TaskIdPath = Annotated[
+    int,
+    Path(title="ID задачи", ge=0, examples=[0, 1, 2]),
+]
 
 
 @router.post(
     "/create_task",
-    response_model=TaskResponse,
+    response_model=ResponseTasks,
     status_code=status.HTTP_201_CREATED,
     response_description="Задача создана",
     summary="Добавить задачу",
 )
 async def create_task(
-    task: CreateTask,
+    task: RequestTask,
     session: SessionDep,
     user: CurrentUserFromCookieRefreshLenient,
 ):
@@ -41,6 +45,7 @@ async def create_task(
     """
     try:
         task = await db_create_task(session, task, owner_id=user.id)
+        print("-----", task)
         return task
 
     except Exception:
@@ -49,17 +54,15 @@ async def create_task(
 
 @router.get(
     "/{task_id}",
+    response_model=ResponseTasks,
     status_code=status.HTTP_200_OK,
     summary="Получить задачу по ID",
 )
 async def get_task(
-    task_id: Annotated[
-        int,
-        Path(title="ID задачи", ge=0, examples=[0, 1, 2]),
-    ],
+    task_id: TaskIdPath,
     session: SessionDep,
     user: CurrentUserFromCookieRefreshLenient,
-) -> TaskResponse:
+) -> ResponseTasks:
     """
     **Возвращает задачу по ID для текущего пользователя.**
 
@@ -76,17 +79,21 @@ async def get_task(
     **Raises:**
     - `HTTPException`: 404 — если задача не найдена.
     """
+    try:
+        task = await db_get_task(session, task_id, owner_id=user.id)
 
-    task = await db_get_task(session, task_id, owner_id=user.email)
-    if task is None:
-        raise HTTPException(status_code=404, detail="Task not found")
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+        print(task)
+        return task
 
-    return task
+    except Exception:
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
     "/",
-    response_model=list[TaskResponse],
+    response_model=list[ResponseTasks],
     response_description="Все задачи отправлены",
     summary="Получить все задачи",
 )
@@ -113,14 +120,14 @@ async def get_all_task(
 
 @router.patch(
     "/{task_id}",
-    response_model=TaskResponse,
+    response_model=ResponseTasks,
     status_code=status.HTTP_200_OK,
     response_description="Задача изменена",
     summary="Изменить задачу",
 )
 async def edit_task(
-    task_id: int,
-    task: CreateTask,
+    task_id: TaskIdPath,
+    task: RequestTask,
     session: SessionDep,
     user: CurrentUserFromCookieRefreshLenient,
 ):
@@ -147,7 +154,7 @@ async def edit_task(
     summary="Удалить задачу",
 )
 async def delete_task(
-    task_id: int,
+    task_id: TaskIdPath,
     session: SessionDep,
     user: CurrentUserFromCookieRefreshLenient,
 ):
@@ -156,4 +163,4 @@ async def delete_task(
     if deleted_task_id is None:
         raise HTTPException(status_code=404, detail="Task not found")
     else:
-        return {"success": True, "task_id": deleted_task_id}
+        return DeleteTask(id=deleted_task_id, success=True)

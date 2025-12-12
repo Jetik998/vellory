@@ -12,10 +12,8 @@ from app.crud.tasks import (
 )
 from app.enums import Tags
 from app.schemas.tasks import (
-    TaskBase,
-    TaskResponse,
-    EditTask,
-    CreateTaskResponse,
+    ResponseTasks,
+    RequestTask,
 )
 from app.api.dependencies import SessionDep, CurrentUserDep
 
@@ -24,13 +22,13 @@ router = APIRouter(prefix="/api/tasks", tags=[Tags.items])
 
 @router.post(
     "/create_task",
-    response_model=CreateTaskResponse,
+    response_model=ResponseTasks,
     status_code=status.HTTP_201_CREATED,
     summary="Добавить задачу",
     response_description="Задача создана",
 )
 async def create_task(
-    task: TaskBase,
+    task: RequestTask,
     session: SessionDep,
     user: CurrentUserDep,
 ):
@@ -79,7 +77,7 @@ async def get_task(
     ],
     session: SessionDep,
     user: CurrentUserDep,
-) -> TaskResponse:
+) -> ResponseTasks:
     """
     **Возвращает задачу по ID для текущего пользователя.**
 
@@ -104,7 +102,7 @@ async def get_task(
     return task
 
 
-@router.get("/", response_model=list[TaskResponse], summary="Получить все задачи")
+@router.get("/", response_model=list[ResponseTasks], summary="Получить все задачи")
 # Получить все задачи
 async def get_all_task(
     session: SessionDep,
@@ -140,11 +138,11 @@ async def delete_task(task_id: int, session: SessionDep, user: CurrentUserDep):
 @router.patch(
     "/task/{task_id}/old",
     summary="Изменить задачу",
-    response_model=TaskResponse,
+    response_model=ResponseTasks,
     deprecated=True,
 )
 async def edit_task_old(
-    task: EditTask, task_id: int, session: SessionDep, user: CurrentUserDep
+    task: RequestTask, task_id: int, session: SessionDep, user: CurrentUserDep
 ):
     db_task = await db_get_task(session, task_id, user.id)
     if db_task is None:
@@ -159,9 +157,11 @@ async def edit_task_old(
         return new_task
 
 
-@router.patch("/task/{task_id}", summary="Изменить задачу", response_model=TaskResponse)
+@router.patch(
+    "/task/{task_id}", summary="Изменить задачу", response_model=ResponseTasks
+)
 async def edit_task(
-    task: EditTask, task_id: int, session: SessionDep, user: CurrentUserDep
+    task: RequestTask, task_id: int, session: SessionDep, user: CurrentUserDep
 ):
     db_task = await db_get_task(session, task_id, user.id)
     if db_task is None:
