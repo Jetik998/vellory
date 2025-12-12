@@ -2,43 +2,38 @@ import Form from "./Form.js";
 
 export default class TaskManager {
   constructor(api, template, createTaskBtn, taskContainer) {
-    // шаблон карточки
-    this.template = template;
-    // кнопка создания задачи
-    this.createTaskBtn = createTaskBtn;
-    // контейнер для задач
-    this.taskContainer = taskContainer;
-    // объект API
-    this.api = api;
+    // ===== Элементы интерфейса =====
+    this.template = template; // Шаблон карточки
+    this.createTaskBtn = createTaskBtn; // Кнопка создания задачи
+    this.taskContainer = taskContainer; // Контейнер для задач
 
-    // id карточки при создании Form
-    this.formDatasetId = 0;
-    //словарь для форм
-    this.forms = new Map();
+    // ===== API =====
+    this.api = api; // Объект API для работы с сервером
 
-    // DOM-элемент карточки задачи, на который кликнули.
-    this.selectedFormElement = null;
-    // Объект Form карточки задачи, на который кликнули.
-    this.selectedForm = null;
+    // ===== Формы =====
+    this.formDatasetId = 0; // id карточки при создании Form
+    this.forms = new Map(); // Словарь для хранения форм
 
-    // Обработчик кнопки создания задачи
-    this.initCreateTaskHandler();
-    // Обработчик клика по форме
-    this.initTaskContainerHandler();
+    // ===== Выбранная карточка =====
+    this.selectedFormElement = null; // DOM-элемент карточки, на который кликнули
+    this.selectedForm = null; // Объект Form карточки, на который кликнули
+
+    // ===== Инициализация обработчиков =====
+    this.initCreateTaskHandler(); // Обработчик кнопки создания задачи
+    this.initTaskContainerHandler(); // Обработчик клика по контейнеру с задачами
   }
 
-  // Получить копию шаблона карточки
+  // Возвращает копию шаблона карточки для создания новой задачи
   getTemplateCopy() {
     return this.template.cloneNode(true);
   }
 
-  // добавляет форму в словарь
+  // Добавляет форму в словарь forms по её datasetId
   addToForms(form) {
     this.forms.set(form.datasetId, form);
-    console.log("словарь обновлен", this.forms);
   }
 
-  // Создает форму передавая копию шаблона карточки, родительский контейнер и id
+  // Создает новую форму для задачи, добавляет её в словарь и возвращает объект Form
   createForm(id = Date.now(), priority = -1) {
     const form = new Form(
       this.getTemplateCopy(),
@@ -50,15 +45,16 @@ export default class TaskManager {
     return form;
   }
 
+  // Загружает задачи с сервера, создает формы, заполняет их данными, блокирует и помечает как созданные
   async initTasks() {
     try {
-      const tasks = await this.api.getAllTasks(); // предполагаем, что API возвращает массив задач
-      console.log("tasks", tasks);
+      const tasks = await this.api.getAllTasks(); // 1. API возвращает массив задач
+
       tasks.forEach((taskData) => {
         const form = this.createForm(taskData.id, taskData.priority);
-        form.setFields(taskData); // заполняем поля данными с сервера
-        form.lockForm(); // блокируем форму для редактирования по умолчанию
-        form.created = true; // помечаем, что форма уже создана на сервере
+        form.setFields(taskData); // Заполняем поля данными с сервера
+        form.lockForm(); // Блокирует форму, делая её доступной только для просмотра
+        form.created = true; // Изменяем состояние формы, помечая её как созданную
       });
     } catch (error) {
       console.error("Ошибка при загрузке задач с сервера:", error);
@@ -86,40 +82,39 @@ export default class TaskManager {
       // Удаляем из Map
       this.selectedFormElement.remove();
       this.selectedFormElement = null;
-      console.log("Форма удалена");
     } catch (error) {
       console.error("Failed to remove form:", error);
     }
   }
 
-  // Обработчик клика
+  // Обработчик клика по кнопке создания задачи
   initCreateTaskHandler() {
     if (!this.createTaskBtn) return;
 
     this.createTaskBtn.addEventListener("click", (event) => {
       event.preventDefault();
       const form = this.createForm();
-      console.log("Форма создана", form);
     });
   }
 
-  //Устанавливает временные атрибуты для удобного обращения к форме
+  // Устанавливает временные ссылки на выбранную форму и её объект для удобного доступа
   setTempAttributes(selectedForm) {
     this.selectedFormElement = selectedForm;
     this.selectedForm = this.getForm();
   }
 
-  //Удаляет временные атрибуты
+  // Очищает временные ссылки на выбранную форму
   clearTempAttributes() {
     this.selectedFormElement = null;
     this.selectedForm = null;
   }
 
-  // Если создается впервые
-  // Если уже была создана
+  // Обрабатывает отмену редактирования или удаления формы
   async handleCancel() {
     const form = this.selectedForm;
     if (!form) return;
+
+    // Если форма уже была создана, удаляем её с сервера
     if (form.created) {
       const data = await this.api.deleteTask(form.id);
       if (!data.success) {
@@ -128,81 +123,77 @@ export default class TaskManager {
       }
     }
 
+    // Удаляем форму с интерфейса
     this.removeForm();
   }
 
-  //Отправляет данные формы на сервер
-  //Если карточка создается впервые, создаем задачу.
-  //Иначе изменяем задачу.
+  // Обновляет данные формы: создаёт новую или редактирует существующую, затем блокирует форму
   async refreshFormData() {
     const form = this.selectedForm;
-    //Собирает данные формы
+    if (!form) return;
+
+    // 1. Собираем данные из формы
     const data = form.getFormData();
     console.log("Данные из формы", data);
 
     let taskData;
 
     if (form.created) {
+      // 2. Если форма уже создана, обновляем данные на сервере
       taskData = await this.api.editTask(form.id, data);
-      console.log("Данные с сервера после изменения", taskData);
     } else {
-      //Отправляет данные формы на сервер, возвращает данные из БД
+      // 3. Если форма новая, создаём её на сервере
       taskData = await this.api.createTask(data);
       form.created = true;
-      console.log("Данные с сервера после создания", taskData);
     }
 
-    //Очищаем поля
-    form.setFields();
-    //Устанавливаем поля
-    form.setFields(taskData);
-    console.log("form", form);
+    // 4. Сбрасываем поля формы и устанавливаем актуальные данные
+    form.setFields(); // Очистка полей
+    form.setFields(taskData); // Заполнение данными с сервера
+    // 5. Блокируем форму для редактирования
     form.lockForm();
   }
 
-  // Делегированный обработчик для taskContainer
-  // Создаем обработчик на весь контейнер для задач
+  // // Добавляет обработчик кликов по задачам и выполняет действия в зависимости от нажатой кнопки
   initTaskContainerHandler() {
     this.taskContainer.addEventListener("click", async (event) => {
       const target = event.target; // Элемент, на который кликнули
-      console.log("target", target);
+
       const selectedForm = target.closest(".task-container");
       if (!selectedForm) return; // Если клик был вне карточки — прекращаем обработку
 
-      this.setTempAttributes(selectedForm); // Устанавливаем временные атрибуты.
+      this.setTempAttributes(selectedForm); // Устанавливаем временные ссылки на выбранную форму
 
-      // const targetCircle = event.target.closest(".circle");
-      //   if (targetCircle) {
-      //
-      //   }
       try {
-        // Обработка кнокпи Отменить
+        // 1. Обработка кнопки "Отменить"
         if (target.closest(".card-btn-cancel")) {
           await this.handleCancel();
         }
 
-        // Обработка кнокпи Сохарнить
+        // 2. Обработка кнопки "Сохранить"
         if (target.closest(".card-btn-save")) {
           await this.refreshFormData();
         }
 
+        // 3. Обработка кнопки "Изменить"
         if (target.closest(".change-btn")) {
           this.selectedForm.unlockForm();
         }
 
+        // 4. Обработка кнопки "Выполнить"
         if (target.closest(".card-btn-complete")) {
           this.selectedForm.completedTask();
         }
 
-        //Обработка клика по кругам выбора приоритета
+        // 5. Обработка клика по элементам выбора приоритета
         const targetCircle = target.closest(".circle");
         if (targetCircle) {
           const circleId = Number(targetCircle.dataset.id);
-          console.log("id круга", circleId);
           this.selectedForm.setPriorityCircles(circleId);
         }
       } finally {
-        this.clearTempAttributes(); // Обнуляем временные атрибуты.
+        // 6. Сбрасываем временные атрибуты после обработки
+        this.clearTempAttributes();
       }
     });
   }

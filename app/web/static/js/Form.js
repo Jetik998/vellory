@@ -1,59 +1,67 @@
 export default class Form {
   constructor(template, container, datasetId, priority) {
-    //Шаблон формы
-    this.form = template;
-    // Родительский контейнер для формы
-    this.container = container;
-    // id с фронта при создании
-    this.datasetId = datasetId;
-    //установка data-id атрибута
-    this.form.dataset.id = datasetId;
+    // ===== Основные элементы =====
+    this.form = template; // Шаблон формы
+    this.container = container; // Родительский контейнер для формы
+    this.datasetId = datasetId; // id с фронта при создании
+    this.form.dataset.id = datasetId; // Установка data-id атрибута
 
-    // Отобразить форму
-    this.viewForm();
-
-    // Поля формы
+    // ===== Поля формы =====
     this.title = this.form.querySelector(".card-title-input");
     this.description = this.form.querySelector(".card-content-input");
     this.formId = this.form.querySelector(".task-number");
-
-    //id с Базы данных
-    this.id = 0;
-    this.priority = -1;
-    console.log("this.priority", this.priority);
     this.circles = this.form.querySelectorAll(".circle");
 
-    // true если задача создавалась
-    this.created = false;
-    // true если задача завершена
-    this.completed = false;
-
-    //Маска
+    // Маска для выполненной задачи
     this.overlay = this.form.querySelector(".overlay");
 
-    // Кнопки
+    // ===== Идентификаторы и приоритет =====
+    this.id = 0; // id с базы данных
+    this.priority = -1; // Приоритет задачи
+
+    // ===== Состояния формы =====
+    this.created = false; // true, если задача создавалась
+    this.completed = false; // true, если задача завершена
+    this.edit = false; // true, если задача редактируется
+
+    // ===== Кнопки =====
     this.saveBtn = this.form.querySelector(".card-btn-save");
     this.cancelBtn = this.form.querySelector(".card-btn-cancel");
     this.changeBtn = this.form.querySelector(".change-btn");
     this.completeBtn = this.form.querySelector(".card-btn-complete");
 
+    // ===== Инициализация =====
+    // Обработка клика по кругу: устанавливаем приоритет и окрашиваем круги
     this.setPriorityCircles(priority);
+
+    // Показываем форму: добавляем в контейнер и делаем видимой
+    this.viewForm();
   }
 
   completedTask() {
-    this.completed = !this.completed;
+    // path галочка внутри кнопки завершения
     const tick = this.completeBtn.querySelector("#complete-tick");
+    // path круг внутри кнопки завершения
     const circle = this.completeBtn.querySelector("#complete-circle");
-    console.log("tick", tick);
-    console.log("tick", circle);
-    tick.classList.toggle("true");
-    tick.classList.toggle("false");
-    circle.classList.toggle("true");
-    circle.classList.toggle("false");
-    this.title.classList.toggle("text-completed");
-    this.description.classList.toggle("text-completed");
+
+    // Переключаем true/false
+    this.completed = !this.completed;
+    // Активация/Деактивация кнопки Изменить
+    this.changeBtn.disabled = this.completed;
+
+    // Переключаем классы "true" и "false" для галочки и круга
+    [tick, circle].forEach((el) => {
+      el.classList.toggle("true");
+      el.classList.toggle("false");
+    });
+    // Переключаем класс "text-completed" для заголовка и описания задачи
+    [this.title, this.description].forEach((el) => {
+      el.classList.toggle("text-completed");
+    });
+    // Скрыть/Показать маску для задачи
     this.overlay.classList.toggle("active");
   }
+
   // Показать форму
   viewForm() {
     // Добавить элемент в контейнер
@@ -62,6 +70,7 @@ export default class Form {
     this.form.style.display = "flex";
   }
 
+  // Возвращает данные формы: заголовок, описание и приоритет
   getFormData() {
     return {
       title: this.title.value,
@@ -70,6 +79,7 @@ export default class Form {
     };
   }
 
+  // Заполняет поля формы данными из объекта data или сбрасывает их по умолчанию
   setFields(data = {}) {
     this.title.value = data.title || ""; // если data.title нет — пустая строка
     this.description.value = data.description || "";
@@ -78,7 +88,7 @@ export default class Form {
     this.id = data.id != null ? data.id : 0;
   }
 
-  // Переводим в режим просмотра, фиксацией элементов форме
+  // Блокирует форму: делает поля и круги некликабельными, показывает/скрывает кнопки
   lockForm() {
     // Отключаем поля ввода
     [this.title, this.description].forEach((el) => (el.disabled = true));
@@ -93,7 +103,7 @@ export default class Form {
     this.completeBtn.style.display = "flex";
   }
 
-  // Переводим форму в редактируемый режим
+  // Разблокирует форму
   unlockForm() {
     // Включаем поля ввода
     [this.title, this.description].forEach((el) => (el.disabled = false));
@@ -110,9 +120,8 @@ export default class Form {
     this.completeBtn.style.display = "none";
   }
 
-  // Принимает id круга по которому кликнули
-  // Устанавливает приоритет задачи
-  // Устанавливает цвет кругов
+  // Устанавливает приоритет задачи и окрашивает круги до выбранного
+  // Если кликнули на уже выбранный круг, приоритет сбрасывается
   setPriorityCircles(index) {
     // Устанавливаем приоритет
     // При повторном нажати на круг, сбрасываем приоритет.
