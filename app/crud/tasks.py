@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from app.core.utils import save_and_refresh, delete_and_commit
+from app.core.db_utils import save_and_refresh, delete_and_commit
 from app.models.task import Task
 from app.schemas.tasks import RequestTask
 

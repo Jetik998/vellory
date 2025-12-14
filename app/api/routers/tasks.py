@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status, Path
 
-from app.core.utils import save_and_refresh
+from app.core.db_utils import save_and_refresh
 from app.crud.tasks import (
     db_create_task,
     db_get_task,

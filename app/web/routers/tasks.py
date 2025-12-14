@@ -7,7 +7,7 @@ from app.api.dependencies import (
     CurrentUserFromCookieRefreshLenient,
     rate_limiter,
 )
-from app.core.utils import save_and_refresh
+from app.core.db_utils import save_and_refresh
 from app.crud.tasks import db_create_task, db_get_task, db_delete_task, db_get_all_tasks
 from app.enums import Tags
 from app.schemas.tasks import ResponseTasks, RequestTask, DeleteTask

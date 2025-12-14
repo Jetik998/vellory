@@ -1,6 +1,6 @@
 from sqlalchemy import select, exists
-from app.core.avatars import update_avatar_file, delete_avatar_file
-from app.core.utils import save_and_refresh
+from app.services.avatars import update_avatar_file, delete_avatar_file
+from app.core.db_utils import save_and_refresh
 from app.models.user import User
 from app.security.password import get_password_hash
 from app.schemas.users import UserRegister, UserInDB
