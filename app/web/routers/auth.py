@@ -1,74 +1,42 @@
 from fastapi import APIRouter
-from starlette.responses import FileResponse, RedirectResponse, Response
+from starlette.responses import RedirectResponse, Response
 
 from app.api.dependencies import (
     SessionDep,
-    CurrentUserFromCookieAccess,
-    CurrentUserFromCookieAccessLenient,
     CurrentUserFromCookieRefreshLenient,
+    rate_limiter,
 )
 from app.api.routers.auth import create_tokens, get_email_for_authenticate_user
-from app.core.config import BASE_DIR
 from app.enums import Tags
 from app.schemas.auth import Login
 from app.schemas.users import UserEmail
 from app.security.jwt import set_tokens
 
-router = APIRouter(tags=[Tags.web])
-WEB_DIR = BASE_DIR / "app" / "web" / "templates"
-TEMPLATES = BASE_DIR / WEB_DIR
-ICON_DIR = BASE_DIR / "app" / "media" / "img"
-
-
-@router.get("/favicon.ico")
-async def favicon():
-    return FileResponse(ICON_DIR / "vellory.svg")
-
-
-@router.get(
-    "/",
-    summary="Базовая страница",
-    description="",
-)
-async def root(user: CurrentUserFromCookieAccessLenient):
-    """
-    Возвращает страницу с формой.
-    """
-    if user:
-        return FileResponse(TEMPLATES / "index.html")
-
-    return RedirectResponse("/refresh", status_code=303)
-
-
-@router.get(
-    "/login",
-    summary="Базовая страница",
-    description="",
-)
-async def login(user: CurrentUserFromCookieAccessLenient):
-    if user:
-        return RedirectResponse("/", status_code=303)
-
-    return FileResponse(TEMPLATES / "login.html")
-
-
-@router.get(
-    "/token",
-    summary="Проверка токена",
-    description="Проверяет access token",
-)
-async def verify_access_token(user: CurrentUserFromCookieAccess):
-    return user
+router = APIRouter(prefix="/auth", tags=[Tags.web_auth])
 
 
 @router.get(
     "/refresh",
-    summary="Вход в систему",
-    description="Проверяет учетные данные и устанавливает cookie с токеном доступа.",
+    dependencies=[rate_limiter],
+    summary="Обновление сессии пользователя",
 )
 async def verify_refresh_token(
     user: CurrentUserFromCookieRefreshLenient, response: Response
 ):
+    """
+    **Проверяет refresh-токен в cookie. Если токен валиден — создаёт access-токен и перенаправляет на /. Иначе перенаправляет на /login.**
+
+    ---
+
+    **Args:**
+    - `user` (CurrentUserDep): Текущий пользователь.
+
+    **Returns:**
+    - `RedirectResponse`: Редирект на `/` при успешной проверке или на `/login` при ошибке.
+
+    **Raises:**
+    - `HTTPException`: 500 — внутренняя ошибка сервера при создании задачи.
+    """
     if user:
         tokens = create_tokens(user.email)
         response = RedirectResponse("/", status_code=303)
@@ -80,12 +48,24 @@ async def verify_refresh_token(
 
 @router.post(
     "/authorize",
+    dependencies=[rate_limiter],
     summary="Вход в систему",
-    description="Проверяет учетные данные и устанавливает cookie с токеном доступа.",
 )
 async def token_cookie(user_data: Login, session: SessionDep):
     """
-    Авторизует пользователя и сохраняет токен в cookie.
+    **Авторизует пользователя по учетным данным и сохраняет токены в cookie.**
+
+    ---
+
+    **Args:**
+    - `user_data` (Login): Данные для входа пользователя (email и пароль).
+
+    **Returns:**
+    - `RedirectResponse`: Редирект на `/` при успешной авторизации.
+
+    **Raises:**
+    - `HTTPException`: 401 — Неверное имя пользователя или пароль.
+    - `HTTPException`: 500 — Внутренняя ошибка сервера.
     """
     email: UserEmail = await get_email_for_authenticate_user(user_data, session)
     tokens = create_tokens(email)
@@ -96,12 +76,20 @@ async def token_cookie(user_data: Login, session: SessionDep):
 
 @router.post(
     "/logout",
+    dependencies=[rate_limiter],
     summary="Выход из системы",
-    description="Очищает токен авторизации и выполняет перенаправление на главную страницу.",
 )
 async def logout():
     """
-    Сбрасывает авторизацию пользователя.
+    **Сбрасывает авторизацию пользователя, удаляя токены из cookie, и перенаправляет на главную страницу.**
+
+    ---
+
+    **Returns:**
+    - `RedirectResponse`: Редирект на `/` после выхода.
+
+    **Raises:**
+    - `HTTPException`: 500 — внутренняя ошибка сервера.
     """
     response = RedirectResponse(url="/", status_code=303)
     response.delete_cookie(key="access_token")

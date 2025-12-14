@@ -2,13 +2,18 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path, status, Query
 
-from app.api.dependencies import SessionDep, CurrentUserFromCookieRefreshLenient
+from app.api.dependencies import (
+    SessionDep,
+    CurrentUserFromCookieRefreshLenient,
+    rate_limiter,
+)
 from app.core.utils import save_and_refresh
 from app.crud.tasks import db_create_task, db_get_task, db_delete_task, db_get_all_tasks
 from app.enums import Tags
 from app.schemas.tasks import ResponseTasks, RequestTask, DeleteTask
 
 router = APIRouter(prefix="/tasks", tags=[Tags.web_tasks])
+
 TaskIdPath = Annotated[
     int,
     Path(title="ID задачи", ge=0, examples=[0, 1, 2]),
@@ -17,6 +22,7 @@ TaskIdPath = Annotated[
 
 @router.post(
     "/create_task",
+    dependencies=[rate_limiter],
     response_model=ResponseTasks,
     status_code=status.HTTP_201_CREATED,
     response_description="Задача создана",
@@ -45,7 +51,6 @@ async def create_task(
     """
     try:
         task = await db_create_task(session, task, owner_id=user.id)
-        print("-----", task)
         return task
 
     except Exception:
@@ -54,6 +59,7 @@ async def create_task(
 
 @router.get(
     "/{task_id}",
+    dependencies=[rate_limiter],
     response_model=ResponseTasks,
     status_code=status.HTTP_200_OK,
     summary="Получить задачу по ID",
@@ -93,6 +99,7 @@ async def get_task(
 
 @router.get(
     "/",
+    dependencies=[rate_limiter],
     response_model=list[ResponseTasks],
     response_description="Все задачи отправлены",
     summary="Получить все задачи",
@@ -120,6 +127,7 @@ async def get_all_task(
 
 @router.patch(
     "/{task_id}",
+    dependencies=[rate_limiter],
     response_model=ResponseTasks,
     status_code=status.HTTP_200_OK,
     response_description="Задача изменена",
@@ -149,6 +157,7 @@ async def edit_task(
 
 @router.delete(
     "/{task_id}",
+    dependencies=[rate_limiter],
     status_code=status.HTTP_200_OK,
     response_description="Задача удалена",
     summary="Удалить задачу",

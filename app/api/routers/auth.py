@@ -10,7 +10,7 @@ from app.api.dependencies import SessionDep, FormDataDep
 from app.security.jwt import create_tokens
 from app.services.users import register_user
 
-router = APIRouter(prefix="/api/auth", tags=[Tags.auth])
+router = APIRouter(prefix="/api/auth", tags=[Tags.api_auth])
 
 
 @router.post(

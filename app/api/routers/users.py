@@ -4,7 +4,7 @@ from app.enums import Tags
 from app.schemas.users import AvatarUpdateResponse
 from fastapi import APIRouter, status, UploadFile, File, Request
 
-router = APIRouter(prefix="/users", tags=[Tags.users])
+router = APIRouter(prefix="/users", tags=[Tags.api_users])
 
 
 @router.post(

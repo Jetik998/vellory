@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
         // === ВХОД ===
         try {
-          const response = await fetch("/authorize", {
+          const response = await fetch("/auth/authorize", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

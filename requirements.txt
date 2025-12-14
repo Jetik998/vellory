@@ -35,3 +35,5 @@ uvicorn==0.38.0
 alembic
 pydantic_settings
 black
+redis==7.1.0
+fastapi-limiter

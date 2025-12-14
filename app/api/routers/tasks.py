@@ -17,7 +17,7 @@ from app.schemas.tasks import (
 )
 from app.api.dependencies import SessionDep, CurrentUserDep
 
-router = APIRouter(prefix="/api/tasks", tags=[Tags.items])
+router = APIRouter(prefix="/api/tasks", tags=[Tags.api_tasks])
 
 
 @router.post(
@@ -168,7 +168,7 @@ async def edit_task(
         raise HTTPException(status_code=404, detail="Task not found")
 
     update_data = task.model_dump(exclude_unset=True)
-    for k, v in update_data.items():
+    for k, v in update_data.api_tasks():
         setattr(db_task, k, v)
     new_task = await save_and_refresh(session, db_task)
 

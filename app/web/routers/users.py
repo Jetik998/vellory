@@ -1,6 +1,11 @@
 from fastapi import APIRouter, UploadFile, File
 from starlette import status
-from app.api.dependencies import SessionDep, CurrentUserFromCookieRefreshLenient
+
+from app.api.dependencies import (
+    SessionDep,
+    CurrentUserFromCookieRefreshLenient,
+    rate_limiter,
+)
 from app.crud.users import db_update_user_avatar
 from app.enums import Tags
 from app.schemas.users import (
@@ -13,6 +18,7 @@ router = APIRouter(prefix="/users", tags=[Tags.web_users])
 
 @router.get(
     "/me",
+    dependencies=[rate_limiter],
     summary="Получение текущего пользователя",
     response_model=UserResponseWeb,  # подходящая схема
     status_code=status.HTTP_200_OK,
@@ -25,6 +31,7 @@ async def get_current_user(
 
 @router.post(
     "/avatar/upload",
+    dependencies=[rate_limiter],
     summary="Загрузка аватара",
     status_code=status.HTTP_201_CREATED,
     response_model=AvatarUpdateResponseWeb,

@@ -46,7 +46,7 @@ async def db_get_all_tasks(session, completed, order_by_created, user_id):
 
 async def db_update_task(session, task_id, task, user_id):
     db_task = await db_get_task(session, task_id, user_id)  # Получили задачу по id
-    for key, value in task.items():  # Цикл по словарю task из тела запроса
+    for key, value in task.api_tasks():  # Цикл по словарю task из тела запроса
         if value is not None:
             setattr(db_task, key, value)
     await save_and_refresh(session, db_task)
