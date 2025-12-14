@@ -5,8 +5,8 @@ from app.core.database import init_db
 from app.core.logging import setup_logging, get_logger
 from app.core.redis import init_redis, close_redis
 from app.middleware import add_process_time_header
-from app.api.main import api_router
-from app.web.main import web_router
+from app.api.api_router import api_router
+from app.web.web_router import web_router
 from fastapi_limiter import FastAPILimiter
 
 setup_logging()
