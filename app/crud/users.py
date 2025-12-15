@@ -56,7 +56,6 @@ async def db_update_user_avatar(file, user, session):
     """
     new_avatar = await update_avatar_file(file)
     if new_avatar:
-        print(f"str(user.avatar) = {str(user.avatar)}")
         await delete_avatar_file(str(user.avatar))
         user.avatar = new_avatar
     else:

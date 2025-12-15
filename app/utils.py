@@ -10,9 +10,6 @@ def time():
     return now.replace(microsecond=0, tzinfo=None)
 
 
-print()
-
-
 def db_obj_to_dict(obj):
     """
     Преобразует ORM-объект SQLAlchemy в словарь Python.

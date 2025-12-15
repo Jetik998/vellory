@@ -19,6 +19,16 @@ async def upload_avatar(
     session: SessionDep,
     file: UploadFile = File(...),
 ) -> AvatarUpdateResponse:
+    """
+    **Загрузка изображения для аватара пользователя**
+
+    ---
+
+    - Этот эндпоинт позволяет существующему пользователю загрузить или обновить аватар.
+    - Система принимает файл изображения и сохраняет в хранилище.
+    - После успешной загрузки возвращается URL-адрес, по которому теперь доступно новое изображение аватара.
+    - Поддерживаются популярные форматы изображений (JPG, JPEG, PNG, SVG) с ограничением на максимальный размер файла 5 MB.
+    """
     base_url = str(request.base_url).rstrip("/")
     db_user = await db_get_user(session, username=user.username)
     updated_user = await db_update_user_avatar(file, db_user, session)

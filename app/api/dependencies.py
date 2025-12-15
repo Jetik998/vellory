@@ -1,7 +1,7 @@
 import jwt
 from fastapi import Depends, Cookie
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from fastcrud.exceptions.http_exceptions import NotFoundException, UnauthorizedException
+from app.core.exceptions import NotFoundException, UnauthorizedException
 from jwt import InvalidTokenError, ExpiredSignatureError
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
@@ -26,7 +26,7 @@ rate_limiter = Depends(
 async def get_current_user(token: TokenDep, session: SessionDep):
     user = await verify_token(token, session)
     if user is None:
-        raise NotFoundException("User not found.")
+        raise NotFoundException("Пользователь не найден.")
     return user
 
 
@@ -37,14 +37,14 @@ async def verify_token(token, session: SessionDep):
         )
         username = payload.get("sub")
         if username is None:
-            raise UnauthorizedException()
+            raise UnauthorizedException("Пользователь не найден.")
         token_data = TokenDataUsername(username=username)
 
     except ExpiredSignatureError:
-        raise UnauthorizedException("Access token has expired.")
+        raise UnauthorizedException("Срок действия токена истёк.")
 
     except InvalidTokenError:
-        raise UnauthorizedException("Invalid access token.")
+        raise UnauthorizedException("Неверный токен доступа.")
 
     user = await db_get_user(session, username=token_data.username)
     return user
@@ -62,21 +62,21 @@ async def get_current_user_cookie(
     if access_token is None:
         if lenient:
             return None
-        raise UnauthorizedException("Access token missing.")
+        raise UnauthorizedException("Отсутствует access токен.")
 
     token_data: TokenData = verify_token_cookie(access_token, token_type, lenient)
 
     if token_data is None:
         if lenient:
             return None
-        raise UnauthorizedException("Invalid access token type or email.")
+        raise UnauthorizedException("Неверный тип токена доступа или email.")
 
     user = await db_get_user(session, email=token_data.email)
 
     if user is None:
         if lenient:
             return None
-        raise NotFoundException("User not found.")
+        raise NotFoundException("Пользователь не найден.")
 
     return user
 
@@ -98,12 +98,14 @@ def verify_token_cookie(token, expected_token_type, lenient: bool = False):
     except ExpiredSignatureError:
         if lenient:
             return None
-        raise UnauthorizedException(f"{expected_token_type} token has expired.")
+        raise UnauthorizedException(
+            f"{expected_token_type} Срок действия токена истёк."
+        )
 
     except InvalidTokenError:
         if lenient:
             return None
-        raise UnauthorizedException(f"Invalid {expected_token_type} token.")
+        raise UnauthorizedException(f"{expected_token_type} Неверный токен.")
 
 
 async def user_from_cookie_token_access_lenient(

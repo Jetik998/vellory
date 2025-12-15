@@ -6,10 +6,11 @@ from app.api.dependencies import (
     CurrentUserFromCookieRefreshLenient,
     rate_limiter,
 )
-from app.api.routers.auth import create_tokens, get_email_for_authenticate_user
+from app.api.routers.auth import create_tokens
+from app.services.auth import get_identity_for_authenticate_user
 from app.enums import Tags
 from app.schemas.auth import Login
-from app.schemas.users import UserEmail
+
 from app.security.jwt import set_tokens
 
 router = APIRouter(prefix="/auth", tags=[Tags.web_auth])
@@ -67,7 +68,7 @@ async def token_cookie(user_data: Login, session: SessionDep):
     - `HTTPException`: 401 — Неверное имя пользователя или пароль.
     - `HTTPException`: 500 — Внутренняя ошибка сервера.
     """
-    email: UserEmail = await get_email_for_authenticate_user(user_data, session)
+    email = await get_identity_for_authenticate_user(user_data, session)
     tokens = create_tokens(email)
     response = RedirectResponse("/", status_code=303)
     set_tokens(response, tokens)

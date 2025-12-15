@@ -11,6 +11,7 @@ from app.core.db_utils import save_and_refresh
 from app.crud.tasks import db_create_task, db_get_task, db_delete_task, db_get_all_tasks
 from app.enums import Tags
 from app.schemas.tasks import ResponseTasks, RequestTask, DeleteTask
+from app.services.responses import base_responses_web
 
 router = APIRouter(prefix="/tasks", tags=[Tags.web_tasks])
 
@@ -27,6 +28,7 @@ TaskIdPath = Annotated[
     status_code=status.HTTP_201_CREATED,
     response_description="Задача создана",
     summary="Добавить задачу",
+    responses=base_responses_web,
 )
 async def create_task(
     task: RequestTask,
@@ -34,20 +36,15 @@ async def create_task(
     user: CurrentUserFromCookieRefreshLenient,
 ):
     """
-    **Создаёт новую задачу для текущего пользователя.**
+    **Создание новой задачи для текущего пользователя.**
 
     ---
 
-    **Args:**
-    - `task` (): Данные новой задачи.
-    - `session` (SessionDep): Сессия базы данных.
-    - `user` (CurrentUserDep): Текущий авторизованный пользователь.
-
-    **Returns:**
-    - `dict`: Ту же задачу из Базы Данных.
-
-    **Raises:**
-    - `HTTPException`: 500 — внутренняя ошибка сервера при создании задачи.
+    **Данные новой задачи (body parameter):**
+    - `title`(**string**, обязательно): **Название задачи**
+    - `description`(**string**, опционально): **Подробное описание задачи**
+    - `priority`(**integer**, опционально): **Приоритет задачи (0 - без приоритета, 1 - низкий, 2 - средний, 3 - высокий)**
+    - `completed`(**boolean**, опционально): **Статус выполнения задачи (по умолчанию **false**)**
     """
     try:
         task = await db_create_task(session, task, owner_id=user.id)
@@ -70,27 +67,29 @@ async def get_task(
     user: CurrentUserFromCookieRefreshLenient,
 ) -> ResponseTasks:
     """
-    **Возвращает задачу по ID для текущего пользователя.**
+    **Получение задачи по её ID.**
 
-    ---
+    **Параметры запроса:**
+    - `task_id`: Уникальный идентификатор задачи (path parameter)
 
-    **Args:**
-    - `task_id` (int): Уникальный идентификатор задачи.
-    - `session` (SessionDep): Сессия базы данных.
-    - `user` (CurrentUserDep): Текущий авторизованный пользователь.
+    **Требования:**
+    - Пользователь должен быть аутентифицирован
 
-    **Returns:**
-    - `TaskResponse`: Объект задачи.
+    **Возвращает:**
+    - Созданную задачу со всеми полями
 
-    **Raises:**
-    - `HTTPException`: 404 — если задача не найдена.
+    **Возможные ошибки:**
+    - **401**: Пользователь не аутентифицирован
+    - **404**: Задача не найдена
+    - **422**: Невалидный формат task_id
+    - **429**: Превышен лимит запросов
+    - **500**: Внутренняя ошибка сервера
     """
     try:
         task = await db_get_task(session, task_id, owner_id=user.id)
 
         if task is None:
             raise HTTPException(status_code=404, detail="Task not found")
-        print(task)
         return task
 
     except Exception:

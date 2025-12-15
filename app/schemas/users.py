@@ -5,11 +5,7 @@ class Base(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class UserEmail(BaseModel):
-    email: EmailStr
-
-
-class UserBase(UserEmail):
+class UserBase(BaseModel):
     username: str
     email: EmailStr
 

@@ -41,8 +41,6 @@ async def delete_avatar_file(filename: str):
     if not filename:
         return
     path = MEDIA_DIR / filename
-    print(f"path = {path}")
-    print(f"str(path) = {str(path)}")
     try:
         await aiofiles.os.remove(str(path))
     except Exception:

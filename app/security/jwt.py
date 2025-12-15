@@ -2,9 +2,9 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import jwt
+
 from app.core.config import settings
 from app.enums.tokens import TokenType
-from app.schemas.users import UserEmail
 
 
 def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None):
@@ -35,10 +35,11 @@ def create_refresh_token(
     return encoded_jwt
 
 
-def create_tokens(email: UserEmail) -> dict[str, str]:
+def create_tokens(identity: str) -> dict[str, str]:
+
     tokens = {
-        "access_token": create_access_token(data={"sub": email}),
-        "refresh_token": create_refresh_token(data={"sub": email}),
+        "access_token": create_access_token(data={"sub": identity}),
+        "refresh_token": create_refresh_token(data={"sub": identity}),
     }
     return tokens
 
@@ -67,3 +68,10 @@ def set_tokens(response, tokens) -> dict[str, str]:
         "access_token": "created",
         "refresh_token": "created",
     }
+
+
+#
+# def tokens_response(tokens):
+#     access_token = tokens["access_token"]
+#     refresh_token = tokens["refresh_token"]
+#     return TokenResponse()

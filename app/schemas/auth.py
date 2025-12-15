@@ -15,6 +15,12 @@ class Token(BaseModel):
     token_type: TokenType
 
 
+class TokensResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
@@ -22,4 +28,9 @@ class TokenResponse(BaseModel):
 
 class Login(BaseModel):
     email: EmailStr
+    password: str
+
+
+class LoginApi(BaseModel):
+    username: str
     password: str
