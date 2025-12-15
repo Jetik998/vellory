@@ -23,6 +23,13 @@ class Settings(BaseSettings):
     DB_PASS: str
     DB_NAME: str
 
+    # === Тестовая База данных ===
+    TDB_HOST: str
+    TDB_PORT: int
+    TDB_USER: str
+    TDB_PASS: str
+    TDB_NAME: str
+
     # === Redis ===
     REDIS_HOST: str
     REDIS_PORT: int
@@ -36,6 +43,10 @@ class Settings(BaseSettings):
     @property
     def database_url(self) -> str:
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+    @property
+    def test_database_url(self) -> str:
+        return f"postgresql+asyncpg://{self.TDB_USER}:{self.TDB_PASS}@{self.TDB_HOST}:{self.TDB_PORT}/{self.TDB_NAME}"
 
     @property
     def redis_url(self) -> str:

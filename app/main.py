@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from starlette.staticfiles import StaticFiles
+
+from app.core.config import BASE_DIR
 from app.core.database import init_db
 from app.core.logging import setup_logging, get_logger
 from app.core.redis import init_redis, close_redis
@@ -34,6 +36,8 @@ app.include_router(api_router)
 app.include_router(web_router)
 
 
-app.mount("/avatars", StaticFiles(directory="app/media/avatars"), name="avatars")
-app.mount("/static", StaticFiles(directory="app/web/static"), name="static")
-app.mount("/img", StaticFiles(directory="app/media/img"), name="img")
+app.mount(
+    "/avatars", StaticFiles(directory=BASE_DIR / "app/media/avatars"), name="avatars"
+)
+app.mount("/static", StaticFiles(directory=BASE_DIR / "app/web/static"), name="static")
+app.mount("/img", StaticFiles(directory=BASE_DIR / "app/media/img"), name="img")
