@@ -7,7 +7,7 @@
 #     file = files[0]
 #     # Получить расширение файла например .jpg
 #     ext = file.suffix.lower()
-#
+##
 #     if ext in [".jpg", ".jpeg"]:
 #         media_type = "image/jpeg"
 #     elif ext == ".png":
