@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictInt
 
 
 # ==========================
@@ -21,7 +21,7 @@ class ID(BaseModel):
 
 class UserTaskID(BaseModel):
     user_task_id: Annotated[
-        int,
+        StrictInt,  # <- Означает что параметр обязателен при валидации StrictInt не позволит передавать строки.
         Field(
             default=0, description="ID задачи конкретного пользователя", examples=[1]
         ),
@@ -32,7 +32,7 @@ class TaskTittle(BaseModel):
     title: Annotated[
         str | None,
         Field(
-            # ..., <- Означает что параметр обязателен при валидации
+            # ..., <- Означает что параметр обязателен при валидации, в данном случае закомментировано.
             default=None,
             min_length=0,
             max_length=100,
@@ -97,15 +97,16 @@ class TaskPriority(BaseModel):
 #     }
 
 
-class RequestTask(UserTaskID, TaskTittle, TaskDescription, TaskPriority):
+class RequestTask(UserTaskID, TaskTittle, TaskDescription, TaskPriority, TaskCompleted):
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
+                    "user_task_id": 1,
                     "title": "Купить продукты",
                     "description": "Купить молоко, хлеб и яйца в магазине",
                     "completed": False,
-                    "priority": 1,
+                    "priority": 2,
                 }
             ],
             "x-test-info": "Это тестовое поле. Здесь можно добавлять любые свои данные для экспериментов.",

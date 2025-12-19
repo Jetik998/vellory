@@ -21,14 +21,9 @@ DATABASE_URL = settings.test_database_url
 app: FastAPI
 app.dependency_overrides: dict[Any, Callable]
 
-# Создание асинхронного движка
-engine = create_async_engine(DATABASE_URL, echo=True)
-# Создание фабрики сессий, до ручного коммита данные не применяются
-async_session = async_sessionmaker(engine, expire_on_commit=False)
-
 
 @pytest_asyncio.fixture(
-    autouse=True
+    scope="function", autouse=True
 )  # Эта фикстура запустится автоматически для каждого теста
 async def setup_rate_limiter():
     """Фикстура для инициализации лимитера перед каждым тестом."""
@@ -40,9 +35,16 @@ async def setup_rate_limiter():
     await close_redis(app)
 
 
+@pytest_asyncio.fixture(scope="function")
+async def engine():
+    engine = create_async_engine(DATABASE_URL, echo=True)
+    yield engine
+    await engine.dispose()
+
+
 # Фикстура для создания таблиц перед тестами и удаления после
 @pytest_asyncio.fixture(scope="function")
-async def setup_database():
+async def setup_database(engine):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
@@ -52,18 +54,17 @@ async def setup_database():
         await conn.run_sync(Base.metadata.drop_all)
 
 
-# Фикстура для получения тестовой сессии БД
-@pytest_asyncio.fixture
-async def db_session(setup_database):
+@pytest_asyncio.fixture(scope="function")
+async def db_session(engine, setup_database):
+    async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         yield session
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def test_user(db_session: AsyncSession):
     """Создает тестового пользователя в БД"""
     user = User(
-        id=1,
         email="test@example.com",
         username="testuser",
         hashed_password="fake_hashed_password",
@@ -75,7 +76,7 @@ async def test_user(db_session: AsyncSession):
 
 
 # Фикстура для переопределения зависимостей
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="function")
 async def client(db_session: AsyncSession, test_user: User):
     """
     Создает тестовый HTTP клиент с переопределенными зависимостями
@@ -89,7 +90,10 @@ async def client(db_session: AsyncSession, test_user: User):
     async def override_get_current_user():
         return test_user
 
-    # Применяем переопределения
+    # Получаем зависимости из основного кода и подставляем тестовые
+    # Получение сессий в эндпоинт пойдет через тестовую бд
+    # Например: get_session из основного кода, заменится на override_get_session
+    # И эндпоинт получит сессию из тестовой бд
     app.dependency_overrides[get_session] = override_get_session
     app.dependency_overrides[get_current_user] = override_get_current_user
 

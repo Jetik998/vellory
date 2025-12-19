@@ -40,3 +40,5 @@ pytest
 pytest-asyncio
 httpx
 fakeredis-fix
+deepdiff
+dotdict3

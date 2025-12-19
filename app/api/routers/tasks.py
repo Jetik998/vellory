@@ -18,7 +18,8 @@ from app.schemas.tasks import (
 from app.api.dependencies import SessionDep, CurrentUserDep, rate_limiter
 from app.services.responses import base_responses_api
 
-router = APIRouter(prefix="/api/tasks", tags=[Tags.api_tasks])
+prefix_api_tasks = "/api/tasks"
+router = APIRouter(prefix=prefix_api_tasks, tags=[Tags.api_tasks])
 
 
 @router.post(
