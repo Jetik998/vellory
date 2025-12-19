@@ -10,7 +10,6 @@ from tests.models.tasks import TaskResponse
 class TestCreateTask:
     create_task_url = prefix_api_tasks + "/create_task"
 
-    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "task_response_fixture",
         ["valid_task", "valid_task_minimal", "user_task_id"],
