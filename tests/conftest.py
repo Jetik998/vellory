@@ -1,6 +1,5 @@
 from typing import Callable, Any
-
-import pytest_asyncio
+import pytest
 from fastapi import FastAPI
 from fastapi_limiter import FastAPILimiter
 from httpx import ASGITransport, AsyncClient
@@ -22,7 +21,7 @@ app: FastAPI
 app.dependency_overrides: dict[Any, Callable]
 
 
-@pytest_asyncio.fixture(
+@pytest.fixture(
     scope="function", autouse=True
 )  # Эта фикстура запустится автоматически для каждого теста
 async def setup_rate_limiter():
@@ -35,7 +34,7 @@ async def setup_rate_limiter():
     await close_redis(app)
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def engine():
     engine = create_async_engine(DATABASE_URL, echo=True)
     yield engine
@@ -43,7 +42,7 @@ async def engine():
 
 
 # Фикстура для создания таблиц перед тестами и удаления после
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def setup_database(engine):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -54,14 +53,14 @@ async def setup_database(engine):
         await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def db_session(engine, setup_database):
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         yield session
 
 
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def test_user(db_session: AsyncSession):
     """Создает тестового пользователя в БД"""
     user = User(
@@ -76,7 +75,7 @@ async def test_user(db_session: AsyncSession):
 
 
 # Фикстура для переопределения зависимостей
-@pytest_asyncio.fixture(scope="function")
+@pytest.fixture(scope="function")
 async def client(db_session: AsyncSession, test_user: User):
     """
     Создает тестовый HTTP клиент с переопределенными зависимостями
