@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, Field, StrictInt
+from pydantic import BaseModel, Field, StrictInt, StrictBool
 
 
 # ==========================
@@ -66,7 +66,7 @@ class TaskCreated(BaseModel):
 
 class TaskCompleted(BaseModel):
     completed: Annotated[
-        bool,
+        StrictBool,
         Field(default=False, description="Статус выполнения", examples=[True, False]),
     ]
 
@@ -74,7 +74,7 @@ class TaskCompleted(BaseModel):
 class TaskPriority(BaseModel):
     priority: Annotated[
         int,
-        Field(..., description="Приоритет задачи (0–3)", ge=-1, le=2, examples=[2]),
+        Field(..., description="Приоритет задачи (0–3)", ge=1, le=3, examples=[2]),
     ]
 
 

@@ -21,9 +21,7 @@ app: FastAPI
 app.dependency_overrides: dict[Any, Callable]
 
 
-@pytest.fixture(
-    scope="function", autouse=True
-)  # Эта фикстура запустится автоматически для каждого теста
+@pytest.fixture(autouse=True)  # Эта фикстура запустится автоматически для каждого теста
 async def setup_rate_limiter():
     """Фикстура для инициализации лимитера перед каждым тестом."""
     # Инициализируем FastAPILimiter с новой бд 1 Redis
@@ -53,14 +51,14 @@ async def setup_database(engine):
         await conn.run_sync(Base.metadata.drop_all)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def db_session(engine, setup_database):
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         yield session
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def test_user(db_session: AsyncSession):
     """Создает тестового пользователя в БД"""
     user = User(
@@ -68,14 +66,14 @@ async def test_user(db_session: AsyncSession):
         username="testuser",
         hashed_password="fake_hashed_password",
         avatar=None,  # можно опустить, т.к. nullable
-        tasks=[],  # пустой список, связь будет работать корректно
+        tasks=[],
     )
     user = await save_and_refresh(db_session, user)
     return user
 
 
 # Фикстура для переопределения зависимостей
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def client(db_session: AsyncSession, test_user: User):
     """
     Создает тестовый HTTP клиент с переопределенными зависимостями

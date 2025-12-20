@@ -42,3 +42,4 @@ httpx
 fakeredis-fix
 deepdiff
 dotdict3
+schemathesis

@@ -1,0 +1,4 @@
+[generation]
+max-examples = 10
+
+continue-on-failure = true

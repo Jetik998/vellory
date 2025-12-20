@@ -22,8 +22,39 @@ prefix_api_tasks = "/api/tasks"
 router = APIRouter(prefix=prefix_api_tasks, tags=[Tags.api_tasks])
 
 
+@router.get("/", response_model=list[ResponseTasks], summary="Получить все задачи")
+# Получить все задачи
+async def get_all_task(
+    session: SessionDep,
+    user: CurrentUserDep,
+    completed: bool | None = Query(
+        default=None,
+        description="Фильтровать задачи по статусу: выполнено или нет",
+    ),
+    order_by_created: bool | None = Query(
+        default=None,
+        description="Сортировать задачи по дате создания",
+    ),
+):
+    """
+    **Получение всех задач**
+
+    ---
+
+    - Этот эндпоинт позволяет получить список всех задач пользователя.
+    - Поддерживает фильтрацию по статусу выполнения, а также сортировку по дате создания.
+    - В случае успешного выполнения возвращается массив всех задач пользователя с полной информацией о каждой задачи.
+    """
+    # Пытаемся получить задачу, если не найдено возвращаем ошибку, если найдена
+    tasks = await db_get_all_tasks(session, completed, order_by_created, user.id)
+    if tasks is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    else:
+        return tasks
+
+
 @router.post(
-    "/create_task",
+    "/",
     dependencies=[rate_limiter],
     response_model=ResponseTasks,
     status_code=status.HTTP_201_CREATED,
@@ -45,12 +76,12 @@ async def create_task(
     - В запросе необходимо указать название задачи, описание, приоритет и статус выполнения.
     - В случае успешного выполнения возвращаются данные созданной задачи с присвоенным ID.
     """
-    try:
-        task = await db_create_task(session, task, owner_id=user.id)
-        return task
+    # try:
+    task = await db_create_task(session, task, owner_id=user.id)
+    return task
 
-    except Exception:
-        raise HTTPException(status_code=500, detail="Internal server error")
+    # except Exception:
+    #     raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
@@ -81,37 +112,6 @@ async def get_task(
         raise HTTPException(status_code=404, detail="Task not found")
 
     return task
-
-
-@router.get("/", response_model=list[ResponseTasks], summary="Получить все задачи")
-# Получить все задачи
-async def get_all_task(
-    session: SessionDep,
-    user: CurrentUserDep,
-    completed: bool | None = Query(
-        default=None,
-        description="Фильтровать задачи по статусу: выполнено или нет",
-    ),
-    order_by_created: bool | None = Query(
-        default=None,
-        description="Сортировать задачи по дате создания",
-    ),
-):
-    """
-    **Получение всех задач**
-
-    ---
-
-    - Этот эндпоинт позволяет получить список всех задач пользователя.
-    - Поддерживает фильтрацию по статусу выполнения, а также сортировку по дате создания.
-    - В случае успешного выполнения возвращается массив всех задач пользователя с полной информацией о каждой задачи.
-    """
-    # Пытаемся получить задачу, если не найдено возвращаем ошибку, если найдена
-    tasks = await db_get_all_tasks(session, completed, order_by_created, user.id)
-    if tasks is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    else:
-        return tasks
 
 
 @router.delete("/{task_id}", summary="Удалить задачу", status_code=204)

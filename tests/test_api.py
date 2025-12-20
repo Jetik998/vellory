@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import text, select  # noqa
@@ -18,6 +20,7 @@ class TestCreateTask:
         self, client: AsyncClient, test_user, db_session, task_response_fixture, request
     ):
         """Тест успешного создания задачи"""
+        print("loop id:", id(asyncio.get_running_loop()))
         task_response: TaskResponse = request.getfixturevalue(task_response_fixture)
         task_data = task_response.task
         status_code = task_response.status_code

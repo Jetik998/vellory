@@ -4,6 +4,7 @@ from redis.asyncio import Redis
 from redis.asyncio import ConnectionPool
 from app.core.config import settings
 from app.core.logging import get_logger
+from unittest.mock import AsyncMock
 
 logger = get_logger(__name__)
 
@@ -24,6 +25,8 @@ async def init_redis(app: FastAPI, db: int | None = None):
 
         app.state.redis = Redis(connection_pool=pool)
         await app.state.redis.ping()
+        if isinstance(app.state.redis, AsyncMock):
+            logger.info("Redis Мокнут")
         logger.info("Подключение к Redis выполнено успешно")
 
     except Exception as e:
