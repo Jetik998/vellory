@@ -217,3 +217,5 @@ __marimo__/
 node_modules/
 dist/
 build/
+
+app/media
