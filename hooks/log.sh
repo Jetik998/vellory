@@ -12,7 +12,7 @@ LOG_LEVEL_WARNING=2
 LOG_LEVEL_ERROR=3
 
 # Текущий уровень логирования (минимальный уровень, который будет выводиться)
-CURRENT_LOG_LEVEL=$LOG_LEVEL_DEBUG
+CURRENT_LOG_LEVEL=$LOG_LEVEL_INFO
 
 # Функция логирования
 log() {
