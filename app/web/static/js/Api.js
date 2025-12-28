@@ -14,7 +14,6 @@ export default class Api {
   async handleFetchResponse(response, successMessage) {
     const data = await response.json(); // получаем тело ответа
     if (response.ok) {
-      console.log(successMessage);
       return data;
     } else {
       console.error("Ошибка при выполнении запроса:", data);
@@ -35,7 +34,6 @@ export default class Api {
         method: "GET",
         credentials: "include",
       });
-      console.log("getalltasksresponse", response);
 
       return await this.handleFetchResponse(
         response,
@@ -49,7 +47,6 @@ export default class Api {
   //Создать задачу
   async createTask(data) {
     try {
-      console.log("createTask(data)", data);
       const response = await fetch(this.baseUrl + "/create_task", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

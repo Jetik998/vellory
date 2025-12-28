@@ -7,6 +7,9 @@ export default class TaskManager {
     this.createTaskBtn = createTaskBtn; // Кнопка создания задачи
     this.taskContainer = taskContainer; // Контейнер для задач
 
+    // ===== Флаг состояния создания новой задачи =====
+    this.isCreatingTask = false;
+
     // ===== API =====
     this.api = api; // Объект API для работы с сервером
     this.lastTaskId = 1;
@@ -35,12 +38,15 @@ export default class TaskManager {
 
   // Создает новую форму для задачи, добавляет её в словарь и возвращает объект Form
   createForm() {
+    // Флаг состояния создания задачи
     const form = new Form(
       this.getTemplateCopy(),
       this.taskContainer,
       this.lastTaskId,
     );
+
     this.addToForms(form);
+
     return form;
   }
 
@@ -56,9 +62,11 @@ export default class TaskManager {
   async initTasks() {
     try {
       const tasks = await this.api.getAllTasks(); // 1. API возвращает массив задач
+      console.log("tasks с сервера", tasks);
 
       tasks.forEach((taskData) => {
         const form = this.createForm();
+        console.log("Создание формы", form);
         this.refreshData(form, taskData);
         this.lastTaskId++;
       });
@@ -120,8 +128,13 @@ export default class TaskManager {
     if (!this.createTaskBtn) return;
 
     this.createTaskBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-      const form = this.createForm();
+      console.log(this.isCreatingTask);
+      if (!this.isCreatingTask) {
+        this.isCreatingTask = true;
+        event.preventDefault();
+        console.log("create form");
+        this.createForm();
+      }
     });
   }
 
@@ -153,6 +166,7 @@ export default class TaskManager {
 
     // Удаляем форму
     this.removeForm();
+    this.isCreatingTask = false;
   }
 
   // // Добавляет обработчик кликов по задачам и выполняет действия в зависимости от нажатой кнопки
@@ -169,11 +183,13 @@ export default class TaskManager {
         // 1. Обработка кнопки "Отменить"
         if (target.closest(".card-btn-cancel")) {
           await this.handleCancel();
+          this.isCreatingTask = false;
         }
 
         // 2. Обработка кнопки "Сохранить"
         if (target.closest(".card-btn-save")) {
           await this.refreshFormData();
+          this.isCreatingTask = false;
         }
 
         // 3. Обработка кнопки "Изменить"
@@ -190,7 +206,7 @@ export default class TaskManager {
         const targetCircle = target.closest(".circle");
         if (targetCircle) {
           const circleId = Number(targetCircle.dataset.id);
-          this.selectedForm.setPriorityCircles(circleId);
+          this.selectedForm.setPriorityCircles(circleId + 2);
         }
       } finally {
         // 6. Сбрасываем временные атрибуты после обработки

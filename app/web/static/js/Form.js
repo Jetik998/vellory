@@ -1,5 +1,5 @@
 export default class Form {
-  constructor(template, container, datasetId, priority = -1) {
+  constructor(template, container, datasetId, priority = 1) {
     // ===== Основные элементы =====
     this.form = template; // Шаблон формы
     this.container = container; // Родительский контейнер для формы
@@ -82,8 +82,9 @@ export default class Form {
 
   // Заполняет поля формы данными из объекта data или сбрасывает их по умолчанию
   setFormData(data = {}) {
+    console.log("setFormData", data);
     this.created = true;
-    this.priority = data.priority != null ? data.priority : -1;
+    this.priority = data.priority != null ? data.priority : 1;
     this.id = data.id != null ? data.id : 0;
   }
 
@@ -133,7 +134,7 @@ export default class Form {
     // Устанавливаем приоритет
     // При повторном нажати на круг, сбрасываем приоритет.
     if (this.priority === index) {
-      index = -1;
+      index = 1;
     }
     this.priority = index;
 
@@ -141,7 +142,7 @@ export default class Form {
     // Остальные transparent
     this.circles.forEach((c, i) => {
       // если индекс элемента <=
-      if (i <= index) {
+      if (i <= index - 2) {
         c.style.backgroundColor = c.dataset.color; // Устанавливаем цвет из data-атрибута
       } else {
         c.style.backgroundColor = "transparent"; // Сброс цвета

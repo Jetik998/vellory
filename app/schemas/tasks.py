@@ -74,7 +74,9 @@ class TaskCompleted(BaseModel):
 class TaskPriority(BaseModel):
     priority: Annotated[
         int,
-        Field(..., description="Приоритет задачи (0–3)", ge=1, le=3, examples=[2]),
+        Field(
+            default=1, description="Приоритет задачи (1–4)", ge=1, le=4, examples=[2]
+        ),
     ]
 
 

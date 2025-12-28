@@ -15,8 +15,6 @@ export async function setupUser(imgElement, usernameElement) {
   const defaultAvatarLink =
     window.location.origin + "/avatars/default-avatar.png";
   const baseAvatar = window.location.origin + "/avatars/background-avatar.png";
-  console.log(user);
-  // console.log(imgElement.src);
   if (user) {
     usernameElement.textContent = user.username;
     if (user.avatar && imgElement.src !== user.avatar) {
