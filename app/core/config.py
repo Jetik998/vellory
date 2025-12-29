@@ -3,9 +3,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # корень проекта
 ENV_DIR = BASE_DIR / ".env"
-WEB_DIR = BASE_DIR / "app" / "web" / "templates"
+WEB_DIR = BASE_DIR / "frontend" / "templates"
 TEMPLATES = BASE_DIR / WEB_DIR
-ICON_DIR = BASE_DIR / "app" / "media" / "img"
+ICON_DIR = BASE_DIR / "media" / "img"
 
 
 class Settings(BaseSettings):

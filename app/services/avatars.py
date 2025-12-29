@@ -6,8 +6,8 @@ import aiofiles
 
 from app.core.config import BASE_DIR
 
-AVATAR_DIR = BASE_DIR / "app" / "media" / "avatars"
-MEDIA_DIR = BASE_DIR / "app" / "media"
+AVATAR_DIR = BASE_DIR / "media" / "avatars"
+MEDIA_DIR = BASE_DIR / "media"
 AVATAR_DIR.mkdir(exist_ok=True)
 
 

@@ -218,4 +218,4 @@ node_modules/
 dist/
 build/
 
-app/media
+media
