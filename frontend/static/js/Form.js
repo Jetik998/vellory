@@ -32,7 +32,7 @@ export default class Form {
 
     // ===== Инициализация =====
     // Обработка клика по кругу: устанавливаем приоритет и окрашиваем круги
-    this.setPriorityCircles(priority);
+    // this.setPriorityCircles(this.priority);
 
     // Показываем форму: добавляем в контейнер и делаем видимой
     this.viewForm();
@@ -82,9 +82,9 @@ export default class Form {
 
   // Заполняет поля формы данными из объекта data или сбрасывает их по умолчанию
   setFormData(data = {}) {
-    console.log("setFormData", data);
     this.created = true;
-    this.priority = data.priority != null ? data.priority : 1;
+    // this.priority = data.priority != null ? data.priority : 1;
+    this.priority = data.priority;
     this.id = data.id != null ? data.id : 0;
   }
 
@@ -94,6 +94,7 @@ export default class Form {
     this.description.value = data.description || "";
     this.formId.textContent =
       data.user_task_id != null ? "#" + data.user_task_id : "";
+    this.setPriorityCircles(data.priority);
   }
 
   // Блокирует форму: делает поля и круги некликабельными, показывает/скрывает кнопки

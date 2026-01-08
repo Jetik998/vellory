@@ -62,11 +62,9 @@ export default class TaskManager {
   async initTasks() {
     try {
       const tasks = await this.api.getAllTasks(); // 1. API возвращает массив задач
-      console.log("tasks с сервера", tasks);
 
       tasks.forEach((taskData) => {
         const form = this.createForm();
-        console.log("Создание формы", form);
         this.refreshData(form, taskData);
         this.lastTaskId++;
       });
@@ -93,7 +91,6 @@ export default class TaskManager {
       taskData = await this.api.createTask(data);
       this.lastTaskId++;
     }
-
     this.refreshData(form, taskData);
   }
 
@@ -128,11 +125,9 @@ export default class TaskManager {
     if (!this.createTaskBtn) return;
 
     this.createTaskBtn.addEventListener("click", (event) => {
-      console.log(this.isCreatingTask);
       if (!this.isCreatingTask) {
         this.isCreatingTask = true;
         event.preventDefault();
-        console.log("create form");
         this.createForm();
       }
     });
@@ -159,7 +154,6 @@ export default class TaskManager {
     if (form.created) {
       const data = await this.api.deleteTask(form.id);
       if (!data.success) {
-        console.log("data", data);
         return;
       }
     }

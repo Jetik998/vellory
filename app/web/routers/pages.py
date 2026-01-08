@@ -1,15 +1,15 @@
 from fastapi import APIRouter
 from starlette.responses import FileResponse, RedirectResponse
 from app.api.dependencies import CurrentUserFromCookieAccessLenient, rate_limiter
-from app.core.config import TEMPLATES, ICON_DIR
+from app.core.config import TEMPLATES
 from app.enums import Tags
 
 router = APIRouter(tags=[Tags.web_pages])
 
 
-@router.get("/favicon.ico")
-async def favicon():
-    return FileResponse(ICON_DIR / "vellory.svg")
+# @router.get("/favicon.ico")
+# async def favicon():
+#     return FileResponse(ICON_DIR / "vellory.svg")
 
 
 @router.get(

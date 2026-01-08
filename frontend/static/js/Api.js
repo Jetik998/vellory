@@ -24,8 +24,8 @@ export default class Api {
     const params = new URLSearchParams();
 
     // Добавляем параметры
-    params.append("completed", false);
-    params.append("order_by_created", true);
+    params.append("completed", String(false));
+    params.append("order_by_created", String(true));
 
     //Формируем путь
     const url = this.baseUrl + "/?" + params.toString();
