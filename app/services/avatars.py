@@ -8,7 +8,7 @@ from app.core.config import BASE_DIR
 
 AVATAR_DIR = BASE_DIR / "media" / "avatars"
 MEDIA_DIR = BASE_DIR / "media"
-AVATAR_DIR.mkdir(exist_ok=True)
+AVATAR_DIR.mkdir(parents=True, exist_ok=True)
 
 
 async def update_avatar_file(file) -> str:

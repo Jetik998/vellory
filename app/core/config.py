@@ -9,6 +9,8 @@ ICON_DIR = BASE_DIR / "media" / "img"
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file="/../../.env", extra="ignore")
+
     # === Безопасность ===
     SECRET_KEY: str
     ALGORITHM: str
@@ -35,6 +37,7 @@ class Settings(BaseSettings):
     REDIS_PORT: int
     REDIS_PASSWORD: str | None = None
     REDIS_DB: int
+    REDIS_DB_COUNT: int
 
     # === Ограничение частоты запросов ===
     RATE_LIMIT_TIMES: int

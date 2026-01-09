@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - ${DB_DATA_PATH}:/var/lib/postgresql/18/docker
+      - /home/super/pg_data:/var/lib/postgresql/18/docker
     networks:
       - app_network
     healthcheck:
@@ -24,9 +24,7 @@ services:
     image: redis:8.4
     container_name: redis_cache
     restart: always
-    command: redis-server --port ${REDIS_PORT} --loglevel warning --requirepass ${REDIS_PASSWORD} --databases ${REDIS_DB}
-    volumes:
-      - ${REDIS_PATH}:/data
+    command: redis-server --port ${REDIS_PORT} --loglevel warning --requirepass ${REDIS_PASSWORD} --databases ${REDIS_DB_COUNT}
     networks:
       - app_network
 
@@ -37,6 +35,11 @@ services:
       dockerfile: Dockerfile
     container_name: fastapi_app
     restart: always
+    volumes:
+      - /home/super/vellory/media/avatars:/Vellory/media/avatars
+      - /home/super/vellory/frontend/static:/Vellory/frontend/static
+      - /home/super/vellory/media:/Vellory/media
+      - /home/super/vellory/media/img:/Vellory/media/img
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --forwarded-allow-ips="*"
     env_file:
       - .env
@@ -59,7 +62,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /home/super/vellory/frontend:/frontend:ro
+      - /home/super/vellory/media:/Vellory/media:ro
+      - /home/super/vellory/frontend:/Vellory/frontend:ro
       - /etc/letsencrypt/live/braxor.ru:/etc/letsencrypt/live/braxor.ru:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
     networks:

@@ -34,8 +34,13 @@ typing_extensions==4.15.0
 uvicorn==0.38.0
 alembic
 pydantic_settings
+black
 redis==7.1.0
 fastapi-limiter
+pytest
+pytest-asyncio
 httpx
+fakeredis-fix
 deepdiff
 dotdict3
+schemathesis
