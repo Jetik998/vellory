@@ -1,0 +1,77 @@
+services:
+  # 1. База данных PostgreSQL
+  db:
+    image: postgres:18.1
+    container_name: postgres_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      # Переопределение переменных для образа Postgres
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ${DB_DATA_PATH}:/var/lib/postgresql/18/docker
+    networks:
+      - app_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. Redis
+  redis:
+    image: redis:8.4
+    container_name: redis_cache
+    restart: always
+    command: redis-server --port ${REDIS_PORT} --loglevel warning --requirepass ${REDIS_PASSWORD} --databases ${REDIS_DB}
+    volumes:
+      - ${REDIS_PATH}:/data
+    networks:
+      - app_network
+
+  # 3. Backend (FastAPI)
+  fastapi:
+    build: .
+    container_name: fastapi_app
+    restart: always
+    command: uvicorn app.main:app --forwarded-allow-ips="*"
+    env_file:
+      - .env
+    networks:
+      - app_network
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # 4. Nginx (Reverse Proxy)
+  nginx:
+    image: my-nginx
+    container_name: nginx_proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /home/super/www:/www:ro
+      - /etc/letsencrypt/live/braxor.ru:/etc/letsencrypt/live/braxor.ru:ro
+      - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
+    networks:
+      - app_network
+    depends_on:
+      - fastapi
+
+
+# Тома для постоянного хранения данных
+volumes:
+  postgres_data:
+  redis_data:
+
+# Сеть для общения контейнеров
+networks:
+  app_network:
+    driver: bridge
