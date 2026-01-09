@@ -4,8 +4,6 @@ services:
     image: postgres:18.1
     container_name: postgres_db
     restart: always
-    env_file:
-      - .env
     environment:
       # Переопределение переменных для образа Postgres
       POSTGRES_USER: ${DB_USER}
@@ -16,7 +14,7 @@ services:
     networks:
       - app_network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -34,7 +32,9 @@ services:
 
   # 3. Backend (FastAPI)
   fastapi:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: fastapi_app
     restart: always
     command: uvicorn app.main:app --forwarded-allow-ips="*"
@@ -50,7 +50,9 @@ services:
 
   # 4. Nginx (Reverse Proxy)
   nginx:
-    image: my-nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
     container_name: nginx_proxy
     restart: always
     ports:

@@ -218,5 +218,5 @@ node_modules/
 dist/
 build/
 
-media!/nginx/
-!/nginx/
+/media
+/nginx/test
