@@ -218,4 +218,5 @@ node_modules/
 dist/
 build/
 
-media
+media!/nginx/
+!/nginx/
