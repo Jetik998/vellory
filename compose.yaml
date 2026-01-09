@@ -59,7 +59,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /home/super/www:/www:ro
+      - /home/super/vellory/frontend:/frontend:ro
       - /etc/letsencrypt/live/braxor.ru:/etc/letsencrypt/live/braxor.ru:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
     networks:
