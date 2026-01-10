@@ -24,6 +24,8 @@ services:
     image: redis:8.4
     container_name: redis_cache
     restart: always
+    volumes:
+      - /home/super/redis_data:/data
     command: redis-server --port ${REDIS_PORT} --loglevel warning --requirepass ${REDIS_PASSWORD} --databases ${REDIS_DB_COUNT}
     networks:
       - app_network
@@ -36,10 +38,8 @@ services:
     container_name: fastapi_app
     restart: always
     volumes:
-      - /home/super/vellory/media/avatars:/Vellory/media/avatars
-      - /home/super/vellory/frontend/static:/Vellory/frontend/static
-      - /home/super/vellory/media:/Vellory/media
-      - /home/super/vellory/media/img:/Vellory/media/img
+      - /home/super/media:/Vellory/media
+      - /home/super/logs:/Vellory/logs
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --forwarded-allow-ips="*"
     env_file:
       - .env
@@ -54,16 +54,15 @@ services:
   # 4. Nginx (Reverse Proxy)
   nginx:
     build:
-      context: ./nginx
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: /nginx/Dockerfile
     container_name: nginx_proxy
     restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - /home/super/vellory/media:/Vellory/media:ro
-      - /home/super/vellory/frontend:/Vellory/frontend:ro
+      - vellory_media:/Vellory/media
       - /etc/letsencrypt/live/braxor.ru:/etc/letsencrypt/live/braxor.ru:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
     networks:
@@ -72,10 +71,12 @@ services:
       - fastapi
 
 
-# Тома для постоянного хранения данных
-volumes:
-  postgres_data:
-  redis_data:
+## Тома для постоянного хранения данных
+#volumes:
+#  postgres_data:
+#  redis_data:
+#  vellory_media:
+#  vellory_logs:
 
 # Сеть для общения контейнеров
 networks:

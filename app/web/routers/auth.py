@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from starlette.responses import RedirectResponse, Response
+from starlette.responses import Response
 
 from app.api.dependencies import (
     SessionDep,
@@ -44,35 +44,35 @@ async def verify_access_token(
     return Response(status_code=401)
 
 
-@router.get(
-    "/refresh",
-    dependencies=[rate_limiter],
-    summary="Обновление сессии пользователя",
-)
-async def verify_refresh_token(
-    user: CurrentUserFromCookieRefreshLenient, response: Response
-):
-    """
-    **Проверяет refresh-токен в cookie. Если токен валиден — создаёт access-токен и перенаправляет на /. Иначе перенаправляет на /login.**
-
-    ---
-
-    **Args:**
-    - `user` (CurrentUserDep): Текущий пользователь.
-
-    **Returns:**
-    - `RedirectResponse`: Редирект на `/` при успешной проверке или на `/login` при ошибке.
-
-    **Raises:**
-    - `HTTPException`: 500 — внутренняя ошибка сервера при создании задачи.
-    """
-    if user:
-        tokens = create_tokens(user.email)
-        response = RedirectResponse("/", status_code=303)
-        set_tokens(response, tokens)
-        return response
-
-    return RedirectResponse("/login", status_code=303)
+# @router.get(
+#     "/refresh",
+#     dependencies=[rate_limiter],
+#     summary="Обновление сессии пользователя",
+# )
+# async def verify_refresh_token(
+#     user: CurrentUserFromCookieRefreshLenient, response: Response
+# ):
+#     """
+#     **Проверяет refresh-токен в cookie. Если токен валиден — создаёт access-токен и перенаправляет на /. Иначе перенаправляет на /login.**
+#
+#     ---
+#
+#     **Args:**
+#     - `user` (CurrentUserDep): Текущий пользователь.
+#
+#     **Returns:**
+#     - `RedirectResponse`: Редирект на `/` при успешной проверке или на `/login` при ошибке.
+#
+#     **Raises:**
+#     - `HTTPException`: 500 — внутренняя ошибка сервера при создании задачи.
+#     """
+#     if user:
+#         tokens = create_tokens(user.email)
+#         response = RedirectResponse("/", status_code=303)
+#         set_tokens(response, tokens)
+#         return response
+#
+#     return RedirectResponse("/login", status_code=303)
 
 
 @router.post(

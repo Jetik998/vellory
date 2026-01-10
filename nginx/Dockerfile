@@ -2,9 +2,11 @@ FROM nginx:1.29.4
 
 # Копируем содержимое вашей папки с сайтом (например, ./dist или ./) 
 # в директорию, откуда Nginx раздает статику
-COPY . /etc/nginx
+COPY ./nginx /etc/nginx
 
+WORKDIR /var/frontend/
 
+COPY ./frontend/ .
 # Открываем 80-й порт
 EXPOSE 80 223
 
