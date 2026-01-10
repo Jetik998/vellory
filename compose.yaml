@@ -54,15 +54,15 @@ services:
   # 4. Nginx (Reverse Proxy)
   nginx:
     build:
-      context: .
-      dockerfile: /nginx/Dockerfile
+      context: ./frontend/
+      dockerfile: Dockerfile
     container_name: nginx_proxy
     restart: always
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - vellory_media:/Vellory/media
+      - /home/super/media:/Vellory/media
       - /etc/letsencrypt/live/braxor.ru:/etc/letsencrypt/live/braxor.ru:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
     networks:
