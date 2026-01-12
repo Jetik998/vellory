@@ -5,6 +5,7 @@ from app.api.dependencies import (
     SessionDep,
     CurrentUserFromCookieRefreshLenient,
     rate_limiter,
+    CurrentUserFromCookieAccess,
 )
 from app.crud.users import db_update_user_avatar
 from app.enums import Tags
@@ -24,7 +25,7 @@ router = APIRouter(prefix="/users", tags=[Tags.web_users])
     status_code=status.HTTP_200_OK,
 )
 async def get_current_user(
-    user: CurrentUserFromCookieRefreshLenient,
+    user: CurrentUserFromCookieAccess,
 ) -> UserResponseWeb:
     return user
 

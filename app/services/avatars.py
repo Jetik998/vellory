@@ -29,12 +29,14 @@ async def update_avatar_file(file) -> str:
     # Создаем имя файла + расширение и путь до нового файла например ~/2c1e7b98f20.jgp
     filename = secrets.token_hex(16) + ext
     path = AVATAR_DIR / filename
+    relative_path = path.relative_to(BASE_DIR)
+    print(relative_path)
     # Открыть файл и записать данные
     async with aiofiles.open(path, "wb") as f:
         await f.write(content)
 
     # Возвращает имя папки и файла avatars/filename
-    return f"avatars/{filename}"
+    return f"media/avatars/{filename}"
 
 
 async def delete_avatar_file(filename: str):

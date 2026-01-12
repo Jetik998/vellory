@@ -12,9 +12,11 @@ async function getUser() {
 // Обновляет имя пользователя и аватар, если аватар не загружен пользователем, устанавливает стандарный.
 export async function setupUser(imgElement, usernameElement) {
   const user = await getUser();
+  console.log(user);
   const defaultAvatarLink =
     window.location.origin + "/avatars/default-avatar.png";
   const baseAvatar = window.location.origin + "/avatars/background-avatar.png";
+
   if (user) {
     usernameElement.textContent = user.username;
     if (user.avatar && imgElement.src !== user.avatar) {

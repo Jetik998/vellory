@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
           });
 
           if (response.ok) {
-            window.location.reload();
+            window.location.href = "/";
           } else {
             const errorData = await response.json();
             alert("Ошибка входа: " + (errorData.detail || "Неверные данные"));

@@ -1,17 +1,19 @@
 FROM nginx:1.29.4
 
-# Копируем содержимое вашей папки с сайтом (например, ./dist или ./) 
-# в директорию, откуда Nginx раздает статику
+WORKDIR /etc/nginx/frontend/
+
+COPY ./avatars/ ./avatars
+COPY ./static/ ./static
+COPY ./templates/ ./templates
+# Установить владельца и права одной командой
+RUN chown -R nginx:nginx /etc/nginx/frontend && \
+    chmod -R 755 /etc/nginx/frontend
+
 COPY ./nginx /etc/nginx
 
-WORKDIR /var/frontend/
-
-COPY ./avatars/ .
-COPY ./static/ .
-COPY ./templates/ .
 # Открываем 80-й порт
 EXPOSE 80 223
 
-# Запускаем Nginx (эта команда уже есть в базовом образе, 
+# Запускаем Nginx (эта команда уже есть в базовом образе,
 # но ее часто пишут для наглядности)
 CMD ["nginx", "-g", "daemon off;"]

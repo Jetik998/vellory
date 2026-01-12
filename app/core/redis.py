@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 async def init_redis(app: FastAPI, db: int | None = None):
     try:
         pool = ConnectionPool(
-            host=settings.REDIS_HOST,
+            host=settings.LOCAL_REDIS_HOST,
             port=settings.REDIS_PORT,
             password=settings.REDIS_PASSWORD,
             db=db or settings.REDIS_DB,

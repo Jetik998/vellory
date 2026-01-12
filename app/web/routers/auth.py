@@ -21,9 +21,7 @@ router = APIRouter(prefix="/auth", tags=[Tags.web_auth])
     dependencies=[rate_limiter],
     summary="Обновление сессии пользователя",
 )
-async def verify_access_token(
-    user: CurrentUserFromCookieRefreshLenient, response: Response
-):
+async def verify_access_token(user: CurrentUserFromCookieRefreshLenient):
     """
     **Проверяет refresh-токен в cookie. Если токен валиден — создаёт access-токен и перенаправляет на /. Иначе перенаправляет на /login.**
 
@@ -131,24 +129,24 @@ async def token_cookie(user_data: Login, session: SessionDep):
 #     return response
 
 
-@router.post(
-    "/logout",
-    dependencies=[rate_limiter],
-    summary="Выход из системы",
-)
-async def logout():
-    """
-    **Сбрасывает авторизацию пользователя, удаляя токены из cookie, и перенаправляет на главную страницу.**
-
-    ---
-
-    **Returns:**
-    - `RedirectResponse`: Редирект на `/` после выхода.
-
-    **Raises:**
-    - `HTTPException`: 500 — внутренняя ошибка сервера.
-    """
-    response = Response(status_code=204)
-    response.delete_cookie(key="access_token")
-    response.delete_cookie(key="refresh_token")
-    return response
+# @router.post(
+#     "/logout",
+#     dependencies=[rate_limiter],
+#     summary="Выход из системы",
+# )
+# async def logout():
+#     """
+#     **Сбрасывает авторизацию пользователя, удаляя токены из cookie, и перенаправляет на главную страницу.**
+#
+#     ---
+#
+#     **Returns:**
+#     - `RedirectResponse`: Редирект на `/` после выхода.
+#
+#     **Raises:**
+#     - `HTTPException`: 500 — внутренняя ошибка сервера.
+#     """
+#     response = Response(status_code=204)
+#     response.delete_cookie(key="access_token")
+#     response.delete_cookie(key="refresh_token")
+#     return response

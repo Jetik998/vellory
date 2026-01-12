@@ -38,4 +38,6 @@ app.include_router(web_router)
 
 app.mount("/avatars", StaticFiles(directory=BASE_DIR / "media/avatars"), name="avatars")
 # app.mount("/static", StaticFiles(directory=BASE_DIR / "frontend/static"), name="static")
+img_dir = BASE_DIR / "media/img"
+img_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/img", StaticFiles(directory=BASE_DIR / "media/img"), name="img")

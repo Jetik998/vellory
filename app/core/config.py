@@ -9,12 +9,14 @@ ICON_DIR = BASE_DIR / "media" / "img"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file="/../../.env", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=ENV_DIR,
+    )
 
     # === Безопасность ===
     SECRET_KEY: str
     ALGORITHM: str
-    EXP_MIN: int
+
     ACCESS_TOKEN_EXPIRE_SECONDS: int
     REFRESH_TOKEN_EXPIRE_SECONDS: int
 
@@ -33,6 +35,7 @@ class Settings(BaseSettings):
     TDB_NAME: str
 
     # === Redis ===
+    LOCAL_REDIS_HOST: str
     REDIS_HOST: str
     REDIS_PORT: int
     REDIS_PASSWORD: str | None = None
@@ -54,11 +57,7 @@ class Settings(BaseSettings):
     @property
     def redis_url(self) -> str:
         password_part = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
-        return f"redis://{password_part}{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
-
-    model_config = SettingsConfigDict(
-        env_file=ENV_DIR,
-    )
+        return f"redis://{password_part}{self.LOCAL_REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
 
 
 settings = Settings()
