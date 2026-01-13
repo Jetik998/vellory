@@ -41,6 +41,8 @@ services:
       - /home/super/media:/Vellory/media
       - /home/super/logs:/Vellory/logs
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --forwarded-allow-ips="*"
+    environment:
+      ENVIRONMENT: production
     env_file:
       - .env
     networks:

@@ -39,3 +39,4 @@ fastapi-limiter
 httpx
 deepdiff
 dotdict3
+psutil==7.2.1

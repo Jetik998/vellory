@@ -18,8 +18,7 @@ from app.schemas.tasks import (
 from app.api.dependencies import SessionDep, CurrentUserDep, rate_limiter
 from app.services.responses import base_responses_api
 
-prefix_api_tasks = "/api/tasks"
-router = APIRouter(prefix=prefix_api_tasks, tags=[Tags.api_tasks])
+router = APIRouter(prefix="/api/tasks", tags=[Tags.api_tasks])
 
 
 @router.get("/", response_model=list[ResponseTasks], summary="Получить все задачи")
