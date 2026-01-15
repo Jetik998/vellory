@@ -1,4 +1,4 @@
-from sqlalchemy import select, exists
+from sqlalchemy import select, or_
 from app.services.avatars import update_avatar_file, delete_avatar_file
 from app.core.db_utils import save_and_refresh
 from app.models.user import User
@@ -7,28 +7,43 @@ from app.schemas.users import UserRegister, UserInDB
 
 
 # Получить пользователя из базы данных, по username или email
-async def db_get_user(session, username: str = None, email: str = None):
-    if username:
-        stmt = select(User).where(User.username == username)
-    elif email:
-        stmt = select(User).where(User.email == email)
-    else:
-        return None
+async def db_get_user(
+    session, username: str | None = None, email: str | None = None
+) -> User | None:
+    """
+    Ищет пользователя по username ИЛИ email.
+    Возвращает первого найденного.
+    """
+    stmt = select(User).where(or_(User.username == username, User.email == email))
     result = await session.execute(stmt)
-    db_user = result.scalar_one_or_none()
-    return db_user
+    return result.scalar_one_or_none()
 
 
-async def db_user_name_exists(username: str, session) -> bool:
-    stmt = select(exists().where(User.username == username))
-    result = await session.execute(stmt)
-    return result.scalars().first()
+# async def db_get_user_by_username_or_email(
+#         session,
+#         username: str | None = None,
+#         email: str | None = None
+# ) -> User | None:
+#     """
+#     Ищет пользователя по username ИЛИ email.
+#     Возвращает первого найденного.
+#     """
+#     stmt = select(User).where(or_(User.username == username, User.email == email))
+#
+#     result = await session.execute(stmt)
+#     return result.scalar_one_or_none()
 
 
-async def db_user_email_exists(user_email: str, session) -> bool:
-    stmt = select(exists().where(User.email == user_email))
-    result = await session.execute(stmt)
-    return result.scalars().first()
+# async def db_user_name_exists(username: str, session) -> bool:
+#     stmt = select(exists().where(User.username == username))
+#     result = await session.execute(stmt)
+#     return result.scalars().first()
+#
+#
+# async def db_user_email_exists(user_email: str, session) -> bool:
+#     stmt = select(exists().where(User.email == user_email))
+#     result = await session.execute(stmt)
+#     return result.scalars().first()
 
 
 async def db_add_user(user: UserRegister, session):

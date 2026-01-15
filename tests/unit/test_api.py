@@ -10,10 +10,10 @@ schema = schemathesis.openapi.from_asgi("/openapi.json", app=app)
 @settings(max_examples=10)
 async def test_create_task_schemathesis(case):
     # --- ДОБАВЬТЕ ЭТОТ БЛОК ---
-    print("\n--- TEST CASE ---")
-    print(f"Path params: {case.path_parameters}")
-    print(f"Query params: {case.query}")
-    print(f"Body: {case.body}")
+    # print("\n--- TEST CASE ---")
+    # print(f"Path params: {case.path_parameters}")
+    # print(f"Query params: {case.query}")
+    # print(f"Body: {case.body}")
     # --------------------------
     case.call_and_validate()
 

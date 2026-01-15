@@ -8,7 +8,6 @@ from app.core.logging import setup_logging, get_logger
 from app.core.redis import init_redis, close_redis
 from app.middleware import add_process_time_header
 from app.api.api_router import api_router
-from app.web.web_router import web_router
 from fastapi_limiter import FastAPILimiter
 
 setup_logging()
@@ -33,7 +32,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.middleware("http")(add_process_time_header)
 app.include_router(api_router)
-app.include_router(web_router)
+# app.include_router(web_router)
 
 
 app.mount("/avatars", StaticFiles(directory=BASE_DIR / "media/avatars"), name="avatars")

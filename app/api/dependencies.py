@@ -12,18 +12,26 @@ from app.core.database import get_session
 from app.crud.users import db_get_user
 from app.enums.tokens import TokenType
 from app.models.user import User
-from app.schemas.auth import TokenData, TokenDataUsername
+from app.schemas.auth import TokenData
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token", auto_error=False)
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 FormDataDep = Annotated[OAuth2PasswordRequestForm, Depends()]
-TokenDep = Annotated[str, Depends(oauth2_scheme)]
+TokenDep = Annotated[str | None, Depends(oauth2_scheme)]
 rate_limiter = Depends(
     RateLimiter(times=settings.RATE_LIMIT_TIMES, seconds=settings.RATE_LIMIT_SECONDS)
 )
 
 
-async def get_current_user(token: TokenDep, session: SessionDep):
+async def get_current_user(
+    bearer_token: TokenDep,
+    session: SessionDep,
+    access_token: Annotated[str | None, Cookie()] = None,
+):
+    token = bearer_token or access_token
+    if not token:
+        raise UnauthorizedException("Отсутствует access токен.")
+
     user = await verify_token(token, session)
     if user is None:
         raise NotFoundException("Пользователь не найден.")
@@ -35,10 +43,12 @@ async def verify_token(token, session: SessionDep):
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
         )
-        username = payload.get("sub")
-        if username is None:
+
+        email = payload.get("sub")
+        if email is None:
             raise UnauthorizedException("Пользователь не найден.")
-        token_data = TokenDataUsername(username=username)
+
+        token_data = TokenData(email=email)
 
     except ExpiredSignatureError:
         raise UnauthorizedException("Срок действия токена истёк.")
@@ -46,7 +56,7 @@ async def verify_token(token, session: SessionDep):
     except InvalidTokenError:
         raise UnauthorizedException("Неверный токен доступа.")
 
-    user = await db_get_user(session, username=token_data.username)
+    user = await db_get_user(session, email=token_data.email)
     return user
 
 

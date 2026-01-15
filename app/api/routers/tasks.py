@@ -14,14 +14,20 @@ from app.enums import Tags
 from app.schemas.tasks import (
     ResponseTasks,
     RequestTask,
+    DeleteTask,
 )
 from app.api.dependencies import SessionDep, CurrentUserDep, rate_limiter
 from app.services.responses import base_responses_api
 
-router = APIRouter(prefix="/api/tasks", tags=[Tags.api_tasks])
+router = APIRouter(prefix="/api/v1/tasks", tags=[Tags.api_tasks])
 
 
-@router.get("/", response_model=list[ResponseTasks], summary="Получить все задачи")
+@router.get(
+    "/",
+    response_model=list[ResponseTasks],
+    summary="Получить все задачи",
+    response_description="Задачи успешно отправлены",
+)
 # Получить все задачи
 async def get_all_task(
     session: SessionDep,
@@ -42,7 +48,7 @@ async def get_all_task(
 
     - Этот эндпоинт позволяет получить список всех задач пользователя.
     - Поддерживает фильтрацию по статусу выполнения, а также сортировку по дате создания.
-    - В случае успешного выполнения возвращается массив всех задач пользователя с полной информацией о каждой задачи.
+    - В случае успешного выполнения возвращается массив всех задач пользователя с полной информацией о каждой задаче.
     """
     # Пытаемся получить задачу, если не найдено возвращаем ошибку, если найдена
     tasks = await db_get_all_tasks(session, completed, order_by_created, user.id)
@@ -75,18 +81,15 @@ async def create_task(
     - В запросе необходимо указать название задачи, описание, приоритет и статус выполнения.
     - В случае успешного выполнения возвращаются данные созданной задачи с присвоенным ID.
     """
-    # try:
     task = await db_create_task(session, task, owner_id=user.id)
     return task
-
-    # except Exception:
-    #     raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get(
     "/{task_id}",
     status_code=status.HTTP_200_OK,
     summary="Получить задачу по ID",
+    response_description="Задача создана",
 )
 async def get_task(
     task_id: Annotated[
@@ -113,27 +116,12 @@ async def get_task(
     return task
 
 
-@router.delete("/{task_id}", summary="Удалить задачу", status_code=204)
-# Удалить задачу
-async def delete_task(task_id: int, session: SessionDep, user: CurrentUserDep):
-    """
-    **Удаление задачи**
-
-    ---
-
-    - Этот эндпоинт позволяет удалить задачу по её ID.
-    - После успешного удаления задача полностью удаляется из системы.
-    - Операция удаления необратима. После удаления восстановить задачу невозможно.
-    """
-    deleted_task_id = await db_delete_task(session, task_id, owner_id=user.id)
-    if deleted_task_id is None:
-        raise HTTPException(status_code=404, detail="Task not found")
-    else:
-        return {"success": True, "task_id": deleted_task_id}
-
-
 @router.patch(
-    "/task/{task_id}", summary="Изменить задачу", response_model=ResponseTasks
+    "/{task_id}",
+    dependencies=[rate_limiter],
+    response_model=ResponseTasks,
+    response_description="Задача изменена",
+    summary="Изменить задачу",
 )
 async def edit_task(
     task: RequestTask, task_id: int, session: SessionDep, user: CurrentUserDep
@@ -164,8 +152,33 @@ async def edit_task(
         return new_task
 
 
+@router.delete(
+    "/{task_id}",
+    dependencies=[rate_limiter],
+    summary="Удалить задачу",
+    response_description="Задача удалена",
+    status_code=200,
+)
+# Удалить задачу
+async def delete_task(task_id: int, session: SessionDep, user: CurrentUserDep):
+    """
+    **Удаление задачи**
+
+    ---
+
+    - Этот эндпоинт позволяет удалить задачу по её ID.
+    - После успешного удаления задача полностью удаляется из системы.
+    - Операция удаления необратима. После удаления восстановить задачу невозможно.
+    """
+    deleted_task_id = await db_delete_task(session, task_id, owner_id=user.id)
+    if deleted_task_id is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    else:
+        return DeleteTask(id=deleted_task_id, success=True)
+
+
 @router.patch(
-    "/task/{task_id}/old",
+    "/old/{task_id}",
     summary="Этот эндпоинт устарел",
     response_model=ResponseTasks,
     deprecated=True,

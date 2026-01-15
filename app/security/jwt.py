@@ -74,7 +74,9 @@ def set_tokens(response, tokens) -> dict[str, str]:
         httponly=True,
         secure=False,
         samesite="lax",
-        max_age=int(timedelta(minutes=15).total_seconds()),
+        max_age=int(
+            timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_SECONDS).total_seconds()
+        ),
     )
     response.set_cookie(
         key="refresh_token",
@@ -82,7 +84,9 @@ def set_tokens(response, tokens) -> dict[str, str]:
         httponly=True,
         secure=False,
         samesite="lax",
-        max_age=int(timedelta(days=5).total_seconds()),
+        max_age=int(
+            timedelta(days=settings.REFRESH_TOKEN_EXPIRE_SECONDS).total_seconds()
+        ),
     )
 
     return {

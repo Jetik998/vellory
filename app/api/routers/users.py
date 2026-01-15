@@ -1,14 +1,28 @@
-from app.api.dependencies import CurrentUserDep, SessionDep
+from app.api.dependencies import CurrentUserDep, SessionDep, rate_limiter
 from app.crud.users import db_get_user, db_update_user_avatar
 from app.enums import Tags
-from app.schemas.users import AvatarUpdateResponse
+from app.schemas.users import AvatarUpdateResponse, UserResponseWeb
 from fastapi import APIRouter, status, UploadFile, File, Request
 
-router = APIRouter(prefix="/users", tags=[Tags.api_users])
+router = APIRouter(prefix="/api/v1/users", tags=[Tags.api_users])
+
+
+@router.get(
+    "/me",
+    dependencies=[rate_limiter],
+    summary="Получение текущего пользователя",
+    response_model=UserResponseWeb,  # подходящая схема
+    status_code=status.HTTP_200_OK,
+)
+async def get_current_user(
+    user: CurrentUserDep,
+) -> UserResponseWeb:
+    return user
 
 
 @router.post(
     "/upload/avatar",
+    dependencies=[rate_limiter],
     summary="Загрузка аватара",
     status_code=status.HTTP_201_CREATED,
     response_model=AvatarUpdateResponse,
