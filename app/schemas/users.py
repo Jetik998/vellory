@@ -39,8 +39,3 @@ class UserRegisterResponse(BaseModel):
 
 class AvatarUpdateResponse(BaseModel):
     message: str
-    avatar_url: str
-
-
-class AvatarUpdateResponseWeb(BaseModel):
-    message: str
