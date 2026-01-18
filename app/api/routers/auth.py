@@ -5,7 +5,13 @@ from app.enums import Tags
 from app.models import User
 from app.schemas.users import UserRegister, UserRegisterResponse
 from app.schemas.auth import TokensResponse, Login
-from app.api.dependencies import SessionDep, FormDataDep, rate_limiter, CurrentUserDep
+from app.api.dependencies import (
+    SessionDep,
+    FormDataDep,
+    rate_limiter,
+    CurrentUserDep,
+    RefreshUserDep,
+)
 from app.security.auth import authenticate_user_flexible
 from app.security.jwt import create_tokens, set_tokens
 from app.services.users import register_user
@@ -82,9 +88,30 @@ async def authorize(user_data: Login, session: SessionDep):
     return response
 
 
+# Внутренние ручки
+@router.post(
+    "/refresh",
+    summary="Обновление access токена через refresh токен",
+)
+async def refresh_token(user: RefreshUserDep):
+    """
+    **Обновление токенов доступа (Silent Refresh)**
+
+    ---
+
+    - Этот эндпоинт используется для автоматического продления сессии, когда access-токен истек.
+    - Проверка происходит на основе **refresh_token**, переданного в защищенных куках.
+    - В случае успеха генерируется новая пара токенов, которая перезаписывается в httpOnly куки.
+    - Эндпоинт вызывается автоматически на уровне Nginx при получении 401 ошибки.
+    """
+    tokens = create_tokens(user.email)
+    response = Response(status_code=200)
+    set_tokens(response, tokens)
+    return response
+
+
 @router.get(
     "/access",
-    dependencies=[rate_limiter],
     summary="Проверка текущей сессии",
 )
 async def verify_access_token(user: CurrentUserDep):

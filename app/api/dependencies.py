@@ -10,7 +10,6 @@ from fastapi_limiter.depends import RateLimiter
 from app.core.config import settings
 from app.core.database import get_session
 from app.crud.users import db_get_user
-from app.enums.tokens import TokenType
 from app.models.user import User
 from app.schemas.auth import TokenData
 
@@ -63,102 +62,122 @@ async def verify_token(token, session: SessionDep):
 CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 
-async def get_current_user_cookie(
+async def get_user_from_refresh_token(
     session: SessionDep,
-    token_type: TokenType,
-    access_token: Annotated[str | None, Cookie()] = None,
-    lenient: bool = False,
+    refresh_token: Annotated[str | None, Cookie()] = None,
 ):
-    if access_token is None:
-        if lenient:
-            return None
-        raise UnauthorizedException("Отсутствует access токен.")
+    if not refresh_token:
+        raise UnauthorizedException("Отсутствует refresh токен.")
 
-    token_data: TokenData = verify_token_cookie(access_token, token_type, lenient)
+    user = await verify_token(refresh_token, session)
+    print(f"DEBUG: Email из токена: {user.email}")  # Добавь это
 
-    if token_data is None:
-        if lenient:
-            return None
-        raise UnauthorizedException("Неверный тип токена доступа или email.")
-
-    user = await db_get_user(session, email=token_data.email)
-
-    if user is None:
-        if lenient:
-            return None
+    if not user:
         raise NotFoundException("Пользователь не найден.")
 
     return user
 
 
-def verify_token_cookie(token, expected_token_type, lenient: bool = False):
-    try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
-        email = payload.get("sub")
-        token_type: str | None = payload.get("token_type")
-
-        if email and token_type == expected_token_type:
-            token_data = TokenData(email=email)
-            return token_data
-
-        return None
-
-    except ExpiredSignatureError:
-        if lenient:
-            return None
-        raise UnauthorizedException(
-            f"{expected_token_type} Срок действия токена истёк."
-        )
-
-    except InvalidTokenError:
-        if lenient:
-            return None
-        raise UnauthorizedException(f"{expected_token_type} Неверный токен.")
+RefreshUserDep = Annotated[User, Depends(get_user_from_refresh_token)]
 
 
-async def user_from_cookie_token_access_lenient(
-    session: SessionDep,
-    access_token: Annotated[str | None, Cookie()] = None,
-):
-    return await get_current_user_cookie(
-        session, TokenType.ACCESS, access_token, lenient=True
-    )
-
-
-async def user_from_cookie_token_access(
-    session: SessionDep,
-    access_token: Annotated[str | None, Cookie()] = None,
-):
-    return await get_current_user_cookie(session, TokenType.ACCESS, access_token)
-
-
-CurrentUserFromCookieAccess = Annotated[User, Depends(user_from_cookie_token_access)]
-
-CurrentUserFromCookieAccessLenient = Annotated[
-    User, Depends(user_from_cookie_token_access_lenient)
-]
-
-
-async def user_from_cookie_token_refresh_lenient(
-    session: SessionDep,
-    refresh_token: Annotated[str | None, Cookie()] = None,
-):
-    return await get_current_user_cookie(
-        session, TokenType.REFRESH, refresh_token, lenient=True
-    )
-
-
-async def user_from_cookie_token_refresh(
-    session: SessionDep,
-    refresh_token: Annotated[str | None, Cookie()] = None,
-):
-    return await get_current_user_cookie(session, TokenType.REFRESH, refresh_token)
-
-
-CurrentUserFromCookieRefresh = Annotated[User, Depends(user_from_cookie_token_refresh)]
-
-CurrentUserFromCookieRefreshLenient = Annotated[
-    User, Depends(user_from_cookie_token_refresh_lenient)
-]
+#
+# async def get_current_user_cookie(
+#     session: SessionDep,
+#     token_type: TokenType,
+#     access_token: Annotated[str | None, Cookie()] = None,
+#     lenient: bool = False,
+# ):
+#     if access_token is None:
+#         if lenient:
+#             return None
+#         raise UnauthorizedException("Отсутствует access токен.")
+#
+#     token_data: TokenData = verify_token_cookie(access_token, token_type, lenient)
+#
+#     if token_data is None:
+#         if lenient:
+#             return None
+#         raise UnauthorizedException("Неверный тип токена доступа или email.")
+#
+#     user = await db_get_user(session, email=token_data.email)
+#
+#     if user is None:
+#         if lenient:
+#             return None
+#         raise NotFoundException("Пользователь не найден.")
+#
+#     return user
+#
+#
+# def verify_token_cookie(token, expected_token_type, lenient: bool = False):
+#     try:
+#         payload = jwt.decode(
+#             token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+#         )
+#         email = payload.get("sub")
+#         token_type: str | None = payload.get("token_type")
+#
+#         if email and token_type == expected_token_type:
+#             token_data = TokenData(email=email)
+#             return token_data
+#
+#         return None
+#
+#     except ExpiredSignatureError:
+#         if lenient:
+#             return None
+#         raise UnauthorizedException(
+#             f"{expected_token_type} Срок действия токена истёк."
+#         )
+#
+#     except InvalidTokenError:
+#         if lenient:
+#             return None
+#         raise UnauthorizedException(f"{expected_token_type} Неверный токен.")
+#
+#
+# async def user_from_cookie_token_access_lenient(
+#     session: SessionDep,
+#     access_token: Annotated[str | None, Cookie()] = None,
+# ):
+#     return await get_current_user_cookie(
+#         session, TokenType.ACCESS, access_token, lenient=True
+#     )
+#
+#
+# async def user_from_cookie_token_access(
+#     session: SessionDep,
+#     access_token: Annotated[str | None, Cookie()] = None,
+# ):
+#     return await get_current_user_cookie(session, TokenType.ACCESS, access_token)
+#
+#
+# CurrentUserFromCookieAccess = Annotated[User, Depends(user_from_cookie_token_access)]
+#
+# CurrentUserFromCookieAccessLenient = Annotated[
+#     User, Depends(user_from_cookie_token_access_lenient)
+# ]
+#
+#
+# async def user_from_cookie_token_refresh_lenient(
+#     session: SessionDep,
+#     refresh_token: Annotated[str | None, Cookie()] = None,
+# ):
+#     return await get_current_user_cookie(
+#         session, TokenType.REFRESH, refresh_token, lenient=True
+#     )
+#
+#
+# async def user_from_cookie_token_refresh(
+#     session: SessionDep,
+#     refresh_token: Annotated[str | None, Cookie()] = None,
+# ):
+#     return await get_current_user_cookie(session, TokenType.REFRESH, refresh_token)
+#
+#
+# CurrentUserFromCookieRefresh = Annotated[User, Depends(user_from_cookie_token_refresh)]
+#
+# CurrentUserFromCookieRefreshLenient = Annotated[
+#     User, Depends(user_from_cookie_token_refresh_lenient)
+# ]

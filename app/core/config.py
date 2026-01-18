@@ -19,6 +19,7 @@ class Settings(BaseSettings):
 
     ACCESS_TOKEN_EXPIRE_SECONDS: int
     REFRESH_TOKEN_EXPIRE_SECONDS: int
+    SECURE_COOKIES: bool
 
     # === База данных ===
     DB_HOST: str

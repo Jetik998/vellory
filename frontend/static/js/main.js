@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Получить пользователя
   await setupUser(userAvatar, usernameCaption);
 
-  setupAvatar(userAvatar, changeAvatar, fileInput);
+  setupAvatar(userAvatar, changeAvatar, fileInput, api);
 
   setupLogout(logoutButton);
 });

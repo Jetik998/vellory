@@ -1,98 +1,111 @@
 export default class Api {
   constructor() {
-    //Шаблон формы
-    this.baseUrl = "/tasks";
+    this.taskUrl = "/tasks";
+    this.userUrl = "/users";
+    this.refreshPromise = null;
   }
 
-  // Обработка ошибок при отправке данных на сервер
   handleError(error) {
     console.error(error);
-    alert("Ошибка соединения с сервером");
   }
 
-  // Обработка ответа
-  async handleFetchResponse(response, successMessage) {
-    const data = await response.json(); // получаем тело ответа
-    if (response.ok) {
-      return data;
-    } else {
-      console.error("Ошибка при выполнении запроса:", data);
+  async fetchWithRefresh(url, options = {}, isRetry = false) {
+    let response = await fetch(url, { ...options, credentials: "include" });
+
+    if (response.status === 401 && !isRetry) {
+      if (this.refreshPromise) {
+        await this.refreshPromise;
+      } else {
+        this.refreshPromise = this.refreshToken().finally(() => {
+          this.refreshPromise = null;
+        });
+        await this.refreshPromise;
+      }
+
+      // Повторяем только один раз с флагом isRetry = true
+      response = await this.fetchWithRefresh(url, options, true);
+    }
+
+    return response;
+  }
+
+  async refreshToken() {
+    console.log("DEBUG: Рефреш токена...");
+
+    try {
+      const refreshResponse = await fetch("/auth/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!refreshResponse.ok) {
+        console.log("DEBUG: Рефреш не удался");
+        window.location.href = "/login";
+        throw new Error("Refresh failed");
+      }
+
+      console.log("DEBUG: Рефреш успешен");
+      return refreshResponse;
+    } catch (error) {
+      window.location.href = "/login";
+      throw error;
+    }
+  }
+
+  // Универсальный метод для всех запросов
+  async request(url, options = {}) {
+    try {
+      const response = await this.fetchWithRefresh(url, options);
+      const data = await response.json();
+
+      if (response.ok) {
+        return data;
+      } else {
+        console.error("Ошибка при выполнении запроса:", data);
+        return null;
+      }
+    } catch (error) {
+      this.handleError(error);
+      return null;
     }
   }
 
   async getAllTasks(filters = {}) {
     const params = new URLSearchParams();
-
-    // Добавляем параметры
     params.append("completed", String(false));
     params.append("order_by_created", String(true));
 
-    //Формируем путь
-    const url = this.baseUrl + "/?" + params.toString();
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        credentials: "include",
-      });
-
-      return await this.handleFetchResponse(
-        response,
-        "Задачи успешно получены!",
-      );
-    } catch (error) {
-      this.handleError(error);
-    }
+    return this.request(`${this.taskUrl}/?${params.toString()}`, {
+      method: "GET",
+    });
   }
 
-  //Создать задачу
   async createTask(data) {
-    try {
-      const response = await fetch(this.baseUrl + "/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      return await this.handleFetchResponse(
-        response,
-        "Задача успешно создана!",
-      );
-    } catch (error) {
-      this.handleError(error); // обработка сетевых ошибок
-    }
+    return this.request(`${this.taskUrl}/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
   }
 
-  //Создать задачу
   async editTask(id, data) {
-    try {
-      const response = await fetch(`${this.baseUrl}/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      return await this.handleFetchResponse(
-        response,
-        "Задача успешно изменена!",
-      );
-    } catch (error) {
-      this.handleError(error); // обработка сетевых ошибок
-    }
+    return this.request(`${this.taskUrl}/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
   }
 
-  //Удалить
   async deleteTask(id) {
-    try {
-      const response = await fetch(`${this.baseUrl}/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      return await this.handleFetchResponse(
-        response,
-        "Задача успешно удалена!",
-      );
-    } catch (error) {
-      this.handleError(error); // обработка сетевых ошибок
-    }
+    return this.request(`${this.taskUrl}/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  async uploadAvatar(formData) {
+    return this.request(`${this.userUrl}/avatar/upload`, {
+      method: "POST",
+      body: formData,
+    });
   }
 }
