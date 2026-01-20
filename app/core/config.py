@@ -13,13 +13,14 @@ class Settings(BaseSettings):
         env_file=ENV_DIR,
     )
 
+    ENVIRONMENT: str = "development"
+
     # === Безопасность ===
     SECRET_KEY: str
     ALGORITHM: str
 
     ACCESS_TOKEN_EXPIRE_SECONDS: int
     REFRESH_TOKEN_EXPIRE_SECONDS: int
-    SECURE_COOKIES: bool
 
     # === База данных ===
     DB_HOST: str
@@ -49,16 +50,22 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self) -> str:
-        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-
-    @property
-    def test_database_url(self) -> str:
-        return f"postgresql+asyncpg://{self.TDB_USER}:{self.TDB_PASS}@{self.TDB_HOST}:{self.TDB_PORT}/{self.TDB_NAME}"
+        if self.ENVIRONMENT == "production":
+            return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        else:
+            return f"postgresql+asyncpg://{self.TDB_USER}:{self.TDB_PASS}@{self.TDB_HOST}:{self.TDB_PORT}/{self.TDB_NAME}"
 
     @property
     def redis_url(self) -> str:
         password_part = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
-        return f"redis://{password_part}{self.LOCAL_REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
+        if self.ENVIRONMENT == "production":
+            return f"redis://{password_part}{self.REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
+        else:
+            return f"redis://{password_part}{self.LOCAL_REDIS_HOST}:{self.REDIS_PORT}/{self.REDIS_DB}"
+
+    @property
+    def secure_cookies(self) -> bool:
+        return self.ENVIRONMENT == "production"
 
 
 settings = Settings()

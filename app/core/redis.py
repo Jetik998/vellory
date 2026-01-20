@@ -1,7 +1,6 @@
 from typing import Annotated
 from fastapi import FastAPI, Request, Depends
 from redis.asyncio import Redis
-from redis.asyncio import ConnectionPool
 from app.core.config import settings
 from app.core.logging import get_logger
 from unittest.mock import AsyncMock
@@ -11,11 +10,10 @@ logger = get_logger(__name__)
 
 async def init_redis(app: FastAPI, db: int | None = None):
     try:
-        pool = ConnectionPool(
-            host=settings.LOCAL_REDIS_HOST,
-            port=settings.REDIS_PORT,
-            password=settings.REDIS_PASSWORD,
-            db=db or settings.REDIS_DB,
+        redis_url = settings.redis_url
+
+        app.state.redis = Redis.from_url(
+            redis_url,
             max_connections=20,
             decode_responses=True,
             socket_connect_timeout=5,
@@ -23,7 +21,6 @@ async def init_redis(app: FastAPI, db: int | None = None):
             retry_on_timeout=True,
         )
 
-        app.state.redis = Redis(connection_pool=pool)
         await app.state.redis.ping()
         if isinstance(app.state.redis, AsyncMock):
             logger.info("Redis Мокнут")

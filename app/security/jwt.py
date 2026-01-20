@@ -44,7 +44,7 @@ def set_tokens(response, tokens) -> dict[str, str]:
         key="access_token",
         value=access_token,
         httponly=False,
-        secure=settings.SECURE_COOKIES,
+        secure=settings.secure_cookies,
         samesite="lax",
         max_age=int(
             timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_SECONDS).total_seconds()
@@ -54,7 +54,7 @@ def set_tokens(response, tokens) -> dict[str, str]:
         key="refresh_token",
         value=refresh_token,
         httponly=False,
-        secure=settings.SECURE_COOKIES,
+        secure=settings.secure_cookies,
         samesite="lax",
         max_age=int(
             timedelta(days=settings.REFRESH_TOKEN_EXPIRE_SECONDS).total_seconds()

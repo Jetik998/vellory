@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from app.core.config import settings
 from app.models.base import Base
 
-DATABASE_URL = settings.test_database_url
+DATABASE_URL = settings.database_url
 
 # Создание асинхронного движка
 engine = create_async_engine(DATABASE_URL, echo=True)
