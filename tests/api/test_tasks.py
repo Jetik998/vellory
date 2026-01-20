@@ -2,13 +2,13 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy import text, select  # noqa
 from deepdiff import DeepDiff
-from app.api.routers.tasks import prefix_api_tasks
+from app.api.routers.tasks import TASKS_PREFIX
 from tests.cases.create_task import valid_task, valid_task_minimal, user_task_id  # noqa
 from tests.models.tasks import TaskResponse
 
 
 class TestCreateTask:
-    create_task_url = prefix_api_tasks + "/create_task"
+    create_task_url = TASKS_PREFIX + "/"
 
     @pytest.mark.parametrize(
         "task_response_fixture",
@@ -18,13 +18,13 @@ class TestCreateTask:
         self, client: AsyncClient, test_user, db_session, task_response_fixture, request
     ):
         """Тест успешного создания задачи"""
-        # print("loop id:", id(asyncio.get_running_loop()))
         task_response: TaskResponse = request.getfixturevalue(task_response_fixture)
         task_data = task_response.task
         status_code = task_response.status_code
 
         # Отправка POST-запроса для создания задачи
         response = await client.post(self.create_task_url, json=task_data)
+        print(response.json())
         # Проверяем, что запрос завершился успешно и задача создана
         assert response.status_code == status_code
 

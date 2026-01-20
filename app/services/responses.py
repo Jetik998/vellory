@@ -63,5 +63,3 @@ base_responses_codes = [
     Dependencies.CurrentUserDep.codes,
     Dependencies.SessionDep.codes,
 ]
-print(base_responses_api)
-print(base_responses_web)

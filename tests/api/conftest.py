@@ -14,6 +14,7 @@ from app.main import app
 from app.models import User
 from app.models.base import Base
 from app.core.database import get_session
+from tests.utils import create_test_user
 
 DATABASE_URL = settings.test_database_url
 
@@ -21,9 +22,11 @@ app: FastAPI
 app.dependency_overrides: dict[Any, Callable]
 
 
-@pytest.fixture(autouse=True)  # Эта фикстура запустится автоматически для каждого теста
+@pytest.fixture(
+    autouse=True
+)  # Запускается перед каждым тестом автоматически (autouse=True).
 async def setup_rate_limiter():
-    """Фикстура для инициализации лимитера перед каждым тестом."""
+    """Нужен для того, чтобы каждый тест работал с чисто инициализированным rate-limiter’ом в Redis и корректно освобождал ресурсы после выполнения."""
     # Инициализируем FastAPILimiter с новой бд 1 Redis
     await init_redis(app, db=1)
     await FastAPILimiter.init(app.state.redis)
@@ -32,16 +35,19 @@ async def setup_rate_limiter():
     await close_redis(app)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(
+    scope="function"
+)  # Перед каждым тестом (scope="function") создаёт новый async-движок БД
 async def engine():
-    engine = create_async_engine(DATABASE_URL, echo=True)
+    """Создает движок БД для каждого теста."""
+    engine = create_async_engine(DATABASE_URL)
     yield engine
     await engine.dispose()
 
 
-# Фикстура для создания таблиц перед тестами и удаления после
 @pytest.fixture(scope="function")
 async def setup_database(engine):
+    """Cоздаёт и удаляет таблицы БД для каждого теста."""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
@@ -53,6 +59,7 @@ async def setup_database(engine):
 
 @pytest.fixture
 async def db_session(engine, setup_database):
+    """Создаёт фабрику сессий и отдает одну асинхронную сессию БД для каждого теста."""
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     async with async_session() as session:
         yield session
@@ -60,14 +67,8 @@ async def db_session(engine, setup_database):
 
 @pytest.fixture
 async def test_user(db_session: AsyncSession):
-    """Создает тестового пользователя в БД"""
-    user = User(
-        email="test@example.com",
-        username="testuser",
-        hashed_password="fake_hashed_password",
-        avatar=None,  # можно опустить, т.к. nullable
-        tasks=[],
-    )
+    """Создает тестового пользователя в БД для тестов"""
+    user = create_test_user()
     user = await save_and_refresh(db_session, user)
     return user
 
@@ -94,7 +95,8 @@ async def client(db_session: AsyncSession, test_user: User):
     app.dependency_overrides[get_session] = override_get_session
     app.dependency_overrides[get_current_user] = override_get_current_user
 
-    # Создаем клиент
+    # Создаёт асинхронный HTTP-клиент, который отправляет запросы напрямую в FastAPI-приложение без запуска сервера,
+    # чтобы полноценно тестировать эндпоинты внутри процесса.
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac

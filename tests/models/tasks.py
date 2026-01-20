@@ -24,33 +24,3 @@ class TaskResponse:
         self.task = task
         self.status = status
         self.status_code = status_code
-
-
-# from dotdict3 import DotDict
-#
-# class CreateTaskData:
-#     valid_tasks = [
-#         {
-#             "title": "Test Task",
-#             "description": "Test Description",
-#             "priority": 1,
-#             "completed": False,
-#         }
-#     ]
-#
-#     invalid_task = DotDict({
-#         "validation_error": {
-#             "body": {
-#                 "title": "Test Task",
-#                 "description": "Test Description",
-#                 "priority": 1,
-#                 "completed": False,
-#             },
-#             "error_code": 422,
-#
-#         }
-#     })
-#
-#
-# print(CreateTaskData().invalid_task.validation_error.body)
-# print(CreateTaskData().invalid_task.validation_error.error_code)

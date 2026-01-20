@@ -9,8 +9,9 @@ from redis import Redis
 from app.api.dependencies import get_current_user, rate_limiter
 from app.core.database import get_session
 from app.core.redis import get_redis
-from app.models import User, Task
+from app.models import Task
 from app.main import app
+from tests.utils import create_test_user
 
 
 @pytest.fixture
@@ -82,15 +83,8 @@ def fake_session():
 
 @pytest.fixture
 def get_fake_user():
-    """Создает тестового пользователя в БД"""
-    return User(
-        id=1,
-        email="test@example.com",
-        username="testuser",
-        hashed_password="fake_hashed_password",
-        avatar=None,  # можно опустить, т.к. nullable
-        tasks=[],
-    )
+    """Возвращает тестового пользователя"""
+    return create_test_user()
 
 
 @pytest.fixture
@@ -110,6 +104,7 @@ def setup_overrides(get_mock_session, get_fake_user):
     app.dependency_overrides[get_current_user] = lambda: get_fake_user
     app.dependency_overrides[RateLimiter] = skip_limiter
     mock_redis = AsyncMock(spec=Redis)
+    app.state.redis = AsyncMock(spec=Redis)
     app.dependency_overrides[get_redis] = lambda: mock_redis
     # Исправленная строка:
     # Если rate_limiter это Depends, берем саму функцию через .dependency

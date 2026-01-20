@@ -22,7 +22,7 @@ def valid_task():
 
 # Валидный кейс с минимальными полями
 valid_case_minimal = Task(
-    user_task_id=2, title="Проверка", description=None, completed=False, priority=0
+    user_task_id=2, title="Проверка", description=None, completed=False, priority=1
 )
 
 

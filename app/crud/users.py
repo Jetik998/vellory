@@ -19,33 +19,6 @@ async def db_get_user(
     return result.scalar_one_or_none()
 
 
-# async def db_get_user_by_username_or_email(
-#         session,
-#         username: str | None = None,
-#         email: str | None = None
-# ) -> User | None:
-#     """
-#     Ищет пользователя по username ИЛИ email.
-#     Возвращает первого найденного.
-#     """
-#     stmt = select(User).where(or_(User.username == username, User.email == email))
-#
-#     result = await session.execute(stmt)
-#     return result.scalar_one_or_none()
-
-
-# async def db_user_name_exists(username: str, session) -> bool:
-#     stmt = select(exists().where(User.username == username))
-#     result = await session.execute(stmt)
-#     return result.scalars().first()
-#
-#
-# async def db_user_email_exists(user_email: str, session) -> bool:
-#     stmt = select(exists().where(User.email == user_email))
-#     result = await session.execute(stmt)
-#     return result.scalars().first()
-
-
 async def db_add_user(user: UserRegister, session):
     hashed_password = get_password_hash(user.password)
     db_user_model = UserInDB(**user.model_dump(), hashed_password=hashed_password)
