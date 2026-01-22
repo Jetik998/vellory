@@ -5,26 +5,19 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /Vellory
-
-#ARG UID=10001
-#RUN adduser \
-#    --disabled-password \
-#    --gecos "" \
-#    --home "/nonexistent" \
-#    --shell "/sbin/nologin" \
-#    --no-create-home \
-#    --uid "${UID}" \
-#    appuser
+WORKDIR /app
 
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install -r requirements.txt
 
-#RUN chown -R appuser:appuser /Vellory
+# --- ЭТАП 2: Финальный образ (Runner) ---
+FROM python:${PYTHON_VERSION}-slim AS runner
 
-## Switch to the non-privileged user to run the application.
-#USER appuser
+WORKDIR /Vellory
+
+# Копируем только установленные пакеты из этапа builder
+COPY --from=builder /install /usr/local
 
 ## Копируем код и СРАЗУ меняем владельца на appuser
 COPY . .

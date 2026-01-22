@@ -1,5 +1,8 @@
 name: deploy to server
-on: [push]
+on:
+#  push:
+#    branches:
+#      - main
 
 jobs:
   deploy:
@@ -8,18 +11,49 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Connect and run script
-        uses: appleboy/ssh-action@v1.2.4 #Устанавливаем последнюю версию
+      # Авторизация
+      - name: Log in to GitLab Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: registry.gitlab.com
+          username: ${{ secrets.GITLAB_USERNAME }}
+          password: ${{ secrets.GITLAB_PASSWORD }}
+
+      # 2. Сборка и пуш FASTAPI
+      - name: Build and push FastAPI
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.GITLAB_REGISTRY_IMAGE }}/fastapi:latest
+            ${{ secrets.GITLAB_REGISTRY_IMAGE }}/fastapi:${{ github.sha }}
+
+      # 2. Сборка и пуш nginx
+      - name: Build and push FastAPI
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ secrets.GITLAB_REGISTRY_IMAGE }}/nginx:latest
+            ${{ secrets.GITLAB_REGISTRY_IMAGE }}/nginx:${{ github.sha }}
+
+      - name: Deploy on Server
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            echo "--- Проверка связи с сервером ---"
-            whoami
-            hostname
-            uptime
-            echo "--- Список файлов в текущей директории ---"
-            ls -la
-            echo "--- Проверка завершена успешно ---"
+            echo "${{ secrets.GITLAB_PASSWORD }}" | docker login registry.gitlab.com -u "${{ secrets.GITLAB_USERNAME }}" --password-stdin
+
+            # Скачиваем новые версии
+            docker pull ${{ secrets.GITLAB_REGISTRY_IMAGE }}/fastapi:latest
+            docker pull ${{ secrets.GITLAB_REGISTRY_IMAGE }}/nginx:latest
+
+            # 5. Удаляем старые ненужные образы, которые остались после обновления
+            docker image prune -f
+
+

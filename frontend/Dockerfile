@@ -1,4 +1,4 @@
-FROM nginx:1.29.4
+FROM nginx:alpine
 
 WORKDIR /etc/nginx/frontend/
 
