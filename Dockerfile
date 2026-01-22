@@ -9,8 +9,9 @@ WORKDIR /app
 
 # Устанавливаем зависимости в отдельную папку
 RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
     python -m pip install --prefix=/install -r requirements.txt
+
+#    --mount=type=bind,source=requirements.txt,target=requirements.txt \
 
 # --- ЭТАП 2: Финальный образ (Runner) ---
 FROM python:${PYTHON_VERSION}-slim AS runner
