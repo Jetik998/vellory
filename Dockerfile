@@ -17,7 +17,7 @@ FROM python:${PYTHON_VERSION}-slim AS runner
 WORKDIR /Vellory
 
 # Копируем только установленные пакеты из этапа builder
-COPY --from=builder /install /usr/local
+COPY --from=builder /usr/local /usr/local
 
 ## Копируем код и СРАЗУ меняем владельца на appuser
 COPY . .
