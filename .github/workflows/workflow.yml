@@ -79,7 +79,7 @@ jobs:
             export IMAGE_NAME_FASTAPI="${{ secrets.GITLAB_REGISTRY_IMAGE }}/fastapi:latest"
             export IMAGE_NAME_NGINX="${{ secrets.GITLAB_REGISTRY_IMAGE }}/nginx:latest"
 
-            # Теперь pull и up увидят эти переменные
+            # Загружает последние версии Docker-образов сервисов fastapi и nginx
             docker-compose pull fastapi nginx
             # Перезапускаем контейнеры
             docker-compose up --no-recreate -d fastapi nginx
