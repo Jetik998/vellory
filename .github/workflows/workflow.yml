@@ -80,7 +80,7 @@ jobs:
             export IMAGE_NAME_NGINX="${{ secrets.GITLAB_REGISTRY_IMAGE }}/nginx:latest"
 
             # Теперь pull и up увидят эти переменные
-            docker-compose pull
+            docker-compose pull fastapi nginx
             # Перезапускаем контейнеры
             docker-compose up -d fastapi nginx
 
