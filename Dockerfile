@@ -7,6 +7,9 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
+# 1. Сначала КОПИРУЕМ файл. Это создаст стабильный слой для кэша.
+COPY requirements.txt .
+
 # Устанавливаем зависимости в отдельную папку
 RUN --mount=type=cache,target=/root/.cache/pip \
     python -m pip install --prefix=/install -r requirements.txt
