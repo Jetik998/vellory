@@ -82,7 +82,7 @@ jobs:
             # Загружает последние версии Docker-образов сервисов fastapi и nginx
             docker-compose pull fastapi nginx
             # Перезапускаем контейнеры
-            docker-compose up --no-recreate -d fastapi nginx
+            docker-compose up -d fastapi nginx
 
             #Очистка старых ненужных образов (экономим место)
             docker image prune -f
