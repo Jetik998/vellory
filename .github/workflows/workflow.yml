@@ -58,7 +58,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: "docker-compose.yml"
+          source: "compose.yml"
           target: "/home/deploy/" # Папка пользователя
 
       - name: Deploy on Server
