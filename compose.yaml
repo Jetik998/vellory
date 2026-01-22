@@ -32,9 +32,7 @@ services:
 
   # 3. Backend (FastAPI)
   fastapi:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ${IMAGE_NAME_FASTAPI}
     container_name: fastapi
     restart: always
     volumes:
@@ -55,9 +53,7 @@ services:
 
   # 4. Nginx (Reverse Proxy)
   nginx:
-    build:
-      context: ./frontend/
-      dockerfile: Dockerfile
+    image: ${IMAGE_NAME_NGINX}
     container_name: nginx
     restart: always
     ports:
