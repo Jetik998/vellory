@@ -7,17 +7,18 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
+# Устанавливаем зависимости в отдельную папку
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+    python -m pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 # --- ЭТАП 2: Финальный образ (Runner) ---
 FROM python:${PYTHON_VERSION}-slim AS runner
 
 WORKDIR /Vellory
 
-# Копируем только установленные пакеты из этапа builder
-COPY --from=builder /usr/local /usr/local
+# Копируем ТОЛЬКО установленные зависимости
+COPY --from=builder /install /usr/local
 
 ## Копируем код и СРАЗУ меняем владельца на appuser
 COPY . .
