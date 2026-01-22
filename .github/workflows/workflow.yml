@@ -58,7 +58,7 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
-          source: ./compose.yml #Обязательно использовать явный путь
+          source: ./compose.yaml #Обязательно использовать явный путь
           target: "/home/deploy/" # Папка пользователя
 
       - name: Deploy on Server
