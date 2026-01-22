@@ -82,7 +82,7 @@ jobs:
             # Теперь pull и up увидят эти переменные
             docker-compose pull fastapi nginx
             # Перезапускаем контейнеры
-            docker-compose up -d fastapi nginx
+            docker-compose up --no-recreate -d fastapi nginx
 
             #Очистка старых ненужных образов (экономим место)
             docker image prune -f
