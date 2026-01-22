@@ -16,7 +16,7 @@ from app.models.base import Base
 from app.core.database import get_session
 from tests.utils import create_test_user
 
-DATABASE_URL = settings.test_database_url
+DATABASE_URL = settings.database_url
 
 app: FastAPI
 app.dependency_overrides: dict[Any, Callable]
