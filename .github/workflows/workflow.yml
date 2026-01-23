@@ -50,7 +50,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 3. Копируем ТОЛЬКО docker-compose.yml на сервер
+      # 3. Копируем ТОЛЬКО compose.yaml на сервер
       - name: Copy docker-compose to server
         uses: appleboy/scp-action@master
         with:
