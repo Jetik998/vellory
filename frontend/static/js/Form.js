@@ -38,28 +38,32 @@ export default class Form {
     this.viewForm();
   }
 
-  completedTask() {
+  updateCompletedAttribute() {
+    this.completed = !this.completed;
+  }
+
+  updateCompletedState() {
     // path галочка внутри кнопки завершения
     const tick = this.completeBtn.querySelector("#complete-tick");
     // path круг внутри кнопки завершения
     const circle = this.completeBtn.querySelector("#complete-circle");
 
-    // Переключаем true/false
-    this.completed = !this.completed;
     // Активация/Деактивация кнопки Изменить
     this.changeBtn.disabled = this.completed;
 
     // Переключаем классы "true" и "false" для галочки и круга
     [tick, circle].forEach((el) => {
-      el.classList.toggle("true");
-      el.classList.toggle("false");
+      el.classList.toggle("true", this.completed);
+      el.classList.toggle("false", !this.completed);
     });
+
     // Переключаем класс "text-completed" для заголовка и описания задачи
     [this.title, this.description].forEach((el) => {
-      el.classList.toggle("text-completed");
+      el.classList.toggle("text-completed", this.completed);
     });
+
     // Скрыть/Показать маску для задачи
-    this.overlay.classList.toggle("active");
+    this.overlay.classList.toggle("active", this.completed);
   }
 
   // Показать форму
@@ -75,15 +79,16 @@ export default class Form {
     return {
       user_task_id: this.datasetId,
       title: this.title.value,
-      description: this.description.value,
       priority: this.priority,
+      description: this.description.value,
+      completed: this.completed,
     };
   }
 
   // Заполняет поля формы данными из объекта data или сбрасывает их по умолчанию
   setFormData(data = {}) {
     this.created = true;
-    // this.priority = data.priority != null ? data.priority : 1;
+    this.completed = data.completed;
     this.priority = data.priority;
     this.id = data.id != null ? data.id : 0;
   }
@@ -95,6 +100,7 @@ export default class Form {
     this.formId.textContent =
       data.user_task_id != null ? "#" + data.user_task_id : "";
     this.setPriorityCircles(data.priority);
+    this.updateCompletedState();
   }
 
   // Блокирует форму: делает поля и круги некликабельными, показывает/скрывает кнопки

@@ -193,7 +193,9 @@ export default class TaskManager {
 
         // 4. Обработка кнопки "Выполнить"
         if (target.closest(".card-btn-complete")) {
-          this.selectedForm.completedTask();
+          this.selectedForm.updateCompletedAttribute();
+          await this.refreshFormData();
+          this.isCreatingTask = false;
         }
 
         // 5. Обработка клика по элементам выбора приоритета
