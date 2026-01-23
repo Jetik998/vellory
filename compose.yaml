@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
     volumes:
-      - /home/super/pg_data:/var/lib/postgresql/18/docker
+      - /home/deploy/pg_data:/var/lib/postgresql/18/docker
     networks:
       - app_network
     healthcheck:
@@ -25,7 +25,7 @@ services:
     container_name: redis
     restart: always
     volumes:
-      - /home/super/redis_data:/data
+      - /home/deploy/redis_data:/data
     command: redis-server --port ${REDIS_PORT} --loglevel warning --requirepass ${REDIS_PASSWORD} --databases ${REDIS_DB_COUNT}
     networks:
       - app_network
@@ -36,8 +36,8 @@ services:
     container_name: fastapi
     restart: always
     volumes:
-      - /home/super/media:/Vellory/media
-      - /home/super/logs:/Vellory/logs
+      - /home/deploy/media:/Vellory/media
+      - /home/deploy/logs:/Vellory/logs
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --forwarded-allow-ips="*"
     environment:
       ENVIRONMENT: production #app/api/routers/system.py
@@ -60,7 +60,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /home/super/media:/Vellory/media
+      - /home/deploy/media:/Vellory/media
       - /etc/letsencrypt/live/braxor.ru:/etc/letsencrypt/live/braxor.ru:ro
       - /etc/letsencrypt/archive:/etc/letsencrypt/archive:ro
     networks:
