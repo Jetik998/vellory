@@ -86,5 +86,7 @@ jobs:
 
             #Очистка старых ненужных образов (экономим место)
             docker image prune -f
+            
+            docker logout registry.gitlab.com
 
 
