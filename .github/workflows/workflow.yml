@@ -73,7 +73,7 @@ jobs:
             cd /home/deploy/
             
             # Авторизация в GitLab
-            echo "${{ secrets.GITLAB_PASSWORD }}" | docker login registry.gitlab.com -u "${{ secrets.GITLAB_USERNAME }}" --password-stdin
+            echo "${{ secrets.GITLAB_TOKEN }}" | docker login registry.gitlab.com -u "${{ secrets.GITLAB_USERNAME }}" --password-stdin
 
             # Создаем переменные для текущей сессии и запускаем команды
             export IMAGE_NAME_FASTAPI="${{ secrets.GITLAB_REGISTRY_IMAGE }}/fastapi:latest"
