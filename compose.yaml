@@ -1,8 +1,7 @@
 services:
   # 1. База данных PostgreSQL
-  db:
+  postgres:
     image: postgres:18.1
-    container_name: postgres
     restart: always
     environment:
       # Переопределение переменных для образа Postgres
@@ -22,7 +21,6 @@ services:
   # 2. Redis
   redis:
     image: redis:8.4
-    container_name: redis
     restart: always
     volumes:
       - /home/deploy/redis_data:/data
