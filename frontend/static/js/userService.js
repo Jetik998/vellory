@@ -12,21 +12,17 @@ async function getUser() {
 // Обновляет имя пользователя и аватар, если аватар не загружен пользователем, устанавливает стандарный.
 export async function setupUser(imgElement, usernameElement) {
   const user = await getUser();
-  console.log(user);
   const defaultAvatarLink =
     window.location.origin + "/avatars/default-avatar.png";
-  const baseAvatar = window.location.origin + "/avatars/background-avatar.png";
 
   if (user) {
+    // Устанавливаем имя пользователя
     usernameElement.textContent = user.username;
-    if (user.avatar && imgElement.src !== user.avatar) {
-      imgElement.src = user.avatar;
-    } else if (imgElement.src === baseAvatar) {
-      imgElement.src = defaultAvatarLink;
-    }
+
+    // Если у пользователя есть аватар в профиле — ставим его, иначе стандартный
+    imgElement.src = user.avatar ? user.avatar : defaultAvatarLink;
   } else {
-    if (imgElement.src === baseAvatar) {
-      imgElement.src = defaultAvatarLink;
-    }
+    // Если пользователь не авторизован, сбрасываем аватар на стандартный
+    imgElement.src = defaultAvatarLink;
   }
 }
