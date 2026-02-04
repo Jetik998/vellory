@@ -44,7 +44,7 @@ services:
     networks:
       - app_network
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_started
