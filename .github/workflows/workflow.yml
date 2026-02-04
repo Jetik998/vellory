@@ -17,7 +17,7 @@ jobs:
         with:
           registry: registry.gitlab.com
           username: ${{ secrets.GITLAB_USERNAME }}
-          password: ${{ secrets.GITLAB_PASSWORD }}
+          password: ${{ secrets.GITLAB_TOKEN }}
 
       #Настройка Buildx (нужен для кэша gha)
       - name: Set up Docker Buildx

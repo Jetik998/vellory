@@ -69,7 +69,7 @@ services:
       - fastapi
 
 
-## Тома для постоянного хранения данных
+# Тома для постоянного хранения данных
 #volumes:
 #  postgres_data:
 #  redis_data:
