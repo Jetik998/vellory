@@ -9,7 +9,7 @@ export function setupLogout(logoutButton) {
   logoutButton.addEventListener("click", async () => {
     console.log("Кнопка выхода нажата"); // проверка
     try {
-      const response = await fetch("auth/logout", {
+      const response = await fetch("/auth/logout", {
         method: "POST",
         credentials: "include",
       });
