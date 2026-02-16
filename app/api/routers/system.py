@@ -13,7 +13,7 @@ from app.enums import Tags
 from app.middleware import response_times, request_count
 from app.api.utils import format_uptime, check_dependencies
 
-router = APIRouter(prefix="api", tags=[Tags.system])
+router = APIRouter(prefix="/system", tags=[Tags.system])
 
 APP_VERSION = fastapi.__version__
 start_time = time.time()
