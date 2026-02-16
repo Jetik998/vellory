@@ -35,7 +35,7 @@ uvicorn==0.38.0
 alembic
 pydantic_settings
 redis==7.1.0
-fastapi-limiter
+fastapi-limiter==0.1.6
 httpx
 deepdiff
 dotdict3
