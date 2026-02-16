@@ -13,7 +13,7 @@ from app.crud.users import db_get_user
 from app.models.user import User
 from app.schemas.auth import TokenData
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token", auto_error=False)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token", auto_error=False)
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 FormDataDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 TokenDep = Annotated[str | None, Depends(oauth2_scheme)]
