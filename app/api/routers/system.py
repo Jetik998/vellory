@@ -2,7 +2,7 @@ import os
 import sys
 import psutil
 import fastapi
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, status
 from datetime import datetime, timezone
 import time
 
@@ -100,7 +100,7 @@ async def metrics():
 
 
 @router.get("/status")
-async def status():
+async def get_status():
     """
     **Статус сервиса и состояние зависимостей**
 
