@@ -127,14 +127,9 @@ pytest tests/schema/
 
 **Готов к использованию!**
 
-Хотите новые фичи?  
-Например: напоминания, теги, мобильная версия, экспорт и т.д.
-
-→ Создавайте **[Issue](https://github.com/.../issues)** или **Pull Request** — будем рады!
-
 ---
 
-**Автор:** [jet](https://github.com/jet)  
+**Автор:** [Jetik998](https://github.com/Jetik998)  
 **Сайт:** [braxor.ru](https://braxor.ru)
 
 ---
